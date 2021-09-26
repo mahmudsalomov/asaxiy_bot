@@ -1,4 +1,7 @@
 package uz.java.maniac.asaxiy_bot.repository;
 
-public interface TelegramUserRepository extends org.springframework.data.jpa.repository.JpaRepository<uz.java.maniac.asaxiy_bot.model.TelegramUser, java.lang.String> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import uz.java.maniac.asaxiy_bot.model.TelegramUser;
+
+public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long> {
 }

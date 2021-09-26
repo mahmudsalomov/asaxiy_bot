@@ -1,4 +1,4 @@
-package uz.shina.bot.util.ButtonModel;
+package uz.java.maniac.asaxiy_bot.utils.ButtonModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import uz.shina.bot.util.TelegramUtil;
+import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.util.ArrayList;
 import java.util.List;

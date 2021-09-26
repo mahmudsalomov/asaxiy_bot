@@ -1,6 +1,17 @@
 package uz.java.maniac.asaxiy_bot.translations;
 
-public enum Types {
+public enum Key {
+    //Text
     LANG_CHOICE,
+
+
+
+
+
+
+    //Buttons
+    PRODUCTS,
+    BASKET,
+
 
 }

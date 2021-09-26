@@ -1,6 +1,5 @@
-package uz.shina.bot.util.ButtonModel;
+package uz.java.maniac.asaxiy_bot.utils.ButtonModel;
 
-import lombok.Builder;
 import org.telegram.telegrambots.meta.api.objects.LoginUrl;
 import org.telegram.telegrambots.meta.api.objects.games.CallbackGame;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;

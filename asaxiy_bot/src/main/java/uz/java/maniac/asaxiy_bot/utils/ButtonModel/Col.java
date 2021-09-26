@@ -1,4 +1,4 @@
-package uz.shina.bot.util.ButtonModel;
+package uz.java.maniac.asaxiy_bot.utils.ButtonModel;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -63,6 +63,9 @@ public class Col {
 
     public void add(String text, String callback) {
         add(new Row(text, callback));
+    }
+    public void add(String text) {
+        add(new Row(text));
     }
 
     public void add(String text, String callback, String url) {
