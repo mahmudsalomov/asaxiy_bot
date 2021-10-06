@@ -71,6 +71,9 @@ public class MessageTemplate {
         if (rootModel==null) return langChoice(user);
         try {
             if (id==1){
+
+
+
                 Col col=new Col();
                 rootModel.getCategories().forEach(c->col.add(c.getName(),"c"+c.getId()));
 
@@ -91,7 +94,6 @@ public class MessageTemplate {
             e.printStackTrace();
             return null;
         }
-
 
     }
 

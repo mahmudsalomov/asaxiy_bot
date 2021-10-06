@@ -1,18 +1,20 @@
 package uz.java.maniac.asaxiy_bot.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 
 @Table(name = "telegram_user")
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
+//@NoArgsConstructor
 @Builder
 public class TelegramUser {
     @Id
@@ -37,7 +39,6 @@ public class TelegramUser {
         this.id = chatId;
         this.state = State.START;
         this.current_category_id=1;
-//        this.action="";
     }
 
     public TelegramUser(org.telegram.telegrambots.meta.api.objects.User user) {
@@ -49,5 +50,16 @@ public class TelegramUser {
         this.current_category_id=1;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        TelegramUser that = (TelegramUser) o;
+        return Objects.equals(id, that.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return 0;
+    }
 }

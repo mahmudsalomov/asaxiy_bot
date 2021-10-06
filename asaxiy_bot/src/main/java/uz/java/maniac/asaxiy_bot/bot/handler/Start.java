@@ -35,16 +35,6 @@ public class Start implements Handler{
             System.out.println(message);
             if (user.getLang()==null){
 
-//                Row row=new Row();
-//                row.add("\uD83C\uDDFA\uD83C\uDDFF Uz", Lang.UZ.name());
-//                row.add("\uD83C\uDDFA\uD83C\uDDFF Ўз", Lang.OZ.name());
-//                row.add("\uD83C\uDDF7\uD83C\uDDFA Ru", Lang.RU.name());
-//
-//                user.setState(State.START);
-//                telegramUserRepository.save(user);
-//                SendMessage messageTemplate = createMessageTemplate(user);
-//                messageTemplate.setReplyMarkup(row.getMarkup());
-//                messageTemplate.setText("Tilni tanlang!\nТилни танланг!\nВыберите язык!");
                 return Collections.singletonList(messageTemplate.langChoice(user));
 
             }

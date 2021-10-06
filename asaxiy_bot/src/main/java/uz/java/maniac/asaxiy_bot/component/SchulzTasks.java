@@ -14,9 +14,21 @@ public class SchulzTasks {
     @Autowired
     private UnirestHelper helper;
     @Scheduled(fixedRate = 500000)
-    public void transform(){
+    public void transform() throws InterruptedException {
         tempRoot.setAllRoot();
+//        if (tempRoot.exists()){
+//
+//            for (int i = 0; i <tempRoot.rootUZ.categories.size() ; i++) {
+//
+//
+//
+//            }
+//
+//        }
     }
+
+
+
 
 
 

@@ -7,6 +7,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.InlineKeyboardModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class TelegramUtil {
     public static SendMessage createMessageTemplate(TelegramUser user) {
@@ -57,6 +60,19 @@ public class TelegramUtil {
                 .callbackData(callback)
                 .url(url)
                 .build();
+    }
+
+
+
+    public static List<Object> pageable(List<Object> objectList, int page, int size){
+        if (objectList == null||page<0||size<0) {
+            return null;
+        }
+
+        List<Object> pageList = new ArrayList<>();
+        int listSize=objectList.size();
+        pageList=objectList.subList(page*size,page*size+size);
+        return pageList;
     }
 
 

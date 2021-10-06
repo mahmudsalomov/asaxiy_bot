@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RootModel {
-    private Root root;
-    private List<Category> categories;
-    private List<Brand> brands;
+    public Root root;
+    public List<Category> categories;
+    public List<Brand> brands;
 
     public RootModel setRootCategory(Root root){
         this.root = root;

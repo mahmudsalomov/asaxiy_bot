@@ -7,7 +7,9 @@ import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.java.maniac.asaxiy_bot.model.Lang;
+import uz.java.maniac.asaxiy_bot.model.json.Category;
 import uz.java.maniac.asaxiy_bot.model.json.Root;
+import uz.java.maniac.asaxiy_bot.model.json.SubRoot;
 import uz.java.maniac.asaxiy_bot.model.temp.RootModel;
 
 @Service
@@ -21,11 +23,17 @@ public class UnirestHelper {
             Gson gson = new Gson();
             String responseJSONString = response.getBody().toString();
             Root root = gson.fromJson(responseJSONString, Root.class);
-            System.out.println(root);
-            System.out.println(root.data);
-            System.out.println(root.data.brands);
-            System.out.println(root.data.categories);
-            root.data.categories.forEach(c-> System.out.println(c.toString()));
+//            System.out.println(root);
+//            System.out.println(root.data);
+//            System.out.println(root.data.brands);
+//            System.out.println(root.data.categories);
+//            root.data.categories.forEach(c-> c.setChildren(getSubCategory(lang,c.id).data.categories));
+//            for (Category c : root.data.categories) {
+//
+//            }
+//            root.data.categories.forEach(c-> System.out.println(c.getId()+" = "+c.children.size()));
+
+
             if (root.getStatus()==1)
 //            rootModel.setRootCategory(root);
             return root;
@@ -35,6 +43,27 @@ public class UnirestHelper {
         }
         return null;
     }
+
+    public SubRoot getSubCategory(Lang lang, int id){
+        try {
+            HttpResponse<JsonNode> response = Unirest.get(Urls.SubCategory+"?id="+id+"&partner=true").header("language",lang.name().toLowerCase()).asJson();
+            Gson gson = new Gson();
+            String responseJSONString = response.getBody().toString();
+            SubRoot subRoot = gson.fromJson(responseJSONString, SubRoot.class);
+            if(subRoot.getData().size()==0) return null;
+//            root.data.categories.forEach(c-> c.setChildren(getSubCategory(lang,c.id).data.categories));
+//            for (int i = 0; i < root.data.categories.size(); i++) {
+//
+//                System.out.println(c.getId()+" sub = "+c.children.size())
+//            }
+//            root.data.categories.forEach(c-> System.out.println(c.getId()+" sub = "+c.children.size()));
+            return subRoot;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 
 }

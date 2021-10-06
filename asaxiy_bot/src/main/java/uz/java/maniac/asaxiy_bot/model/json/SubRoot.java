@@ -1,17 +1,14 @@
 package uz.java.maniac.asaxiy_bot.model.json;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.List;
+
 @lombok.Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Root extends Thread{
+public class SubRoot {
     public int status;
-    public Data data;
-
-
-
+    public List<Category> data;
 }
