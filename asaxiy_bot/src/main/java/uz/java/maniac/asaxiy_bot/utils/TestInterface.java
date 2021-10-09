@@ -8,6 +8,7 @@ public class TestInterface <T>{
 
          List<T> pageList = new ArrayList<>();
          if (objectList!=null&&page>0&&size>0){
+
              int listSize=objectList.size();
 
 //             if (listSize<size){
