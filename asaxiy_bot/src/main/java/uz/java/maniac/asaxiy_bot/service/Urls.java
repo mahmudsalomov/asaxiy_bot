@@ -6,4 +6,6 @@ public interface Urls {
     String RootCategory=Prefix+"/product/root-category";
     String SubCategory=Prefix+"/product/sub-category";
 
+    String product=Prefix+"/product/list";
+
 }

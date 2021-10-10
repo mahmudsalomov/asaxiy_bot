@@ -60,9 +60,10 @@ public class Start implements Handler{
             user.setLang(Lang.valueOf(text));
         }
 
-        SendMessage messageTemplate = createMessageTemplate(user);
-        messageTemplate.setText(user.getLang().name());
-        return Collections.singletonList(messageTemplate);
+//        SendMessage messageTemplate = createMessageTemplate(user);
+//        messageTemplate.setText(user.getLang().name());
+
+        return Collections.singletonList(messageTemplate.mainMenu(user));
     }
 
     @Override

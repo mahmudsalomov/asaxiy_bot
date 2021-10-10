@@ -12,7 +12,9 @@ public enum Translations {
     Promotions("\uD83C\uDF89 Акциялар","\uD83C\uDF89 Aktsiyalar","\uD83C\uDF89 Акции"),
     Basket("\uD83D\uDED2 Саватча","\uD83D\uDED2 Savatcha","\uD83D\uDED2 Корзина"),
     Profile("\uD83D\uDC64 Профил","\uD83D\uDC64 Profil","\uD83D\uDC64 Профиль"),
-
+    Search("\uD83D\uDD0D Қидирув","\uD83D\uDD0D Qidiruv","\uD83D\uDD0D Поиск"),
+    BackBtn("\uD83D\uDD19 Орқага","\uD83D\uDD19 Orqaga","\uD83D\uDD19 Назад"),
+    MainMenuBtn("\uD83C\uDFD8 Бош саҳифа","\uD83C\uDFD8 Bosh sahifa","\uD83C\uDFD8 Дом"),
     Menu(
             "Асахий ботига хуш келибсиз. Марҳамат хизмат турини танланг",
             "Asaxiy botiga xush kelibsiz. Marhamat xizmat turini tanlang!",

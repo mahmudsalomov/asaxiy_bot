@@ -7,14 +7,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import uz.java.maniac.asaxiy_bot.bot.handler.Handler;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
+import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
 import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
 import uz.java.maniac.asaxiy_bot.service.TelegramUserService;
+import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,6 +36,23 @@ public class UpdateReceiver {
 
 
 
+
+    private List<PartialBotApiMethod<? extends Serializable>> handleIncomingInlineQuery(TelegramUser user, InlineQuery inlineQuery) {
+        String query = inlineQuery.getQuery();
+        System.out.println("Searching: " + query);
+        if (!query.isEmpty()) {
+            MessageTemplate messageTemplate=new MessageTemplate();
+            return Collections.singletonList(messageTemplate.simple(user));
+        } else {
+            return null;
+        }
+
+    }
+
+
+
+
+
     @Autowired
     public UpdateReceiver(List<Handler> handlers, TelegramUserRepository telegramUserRepository, TelegramUserService telegramUserService) {
         this.handlers = handlers;
@@ -42,6 +63,16 @@ public class UpdateReceiver {
     @Transactional
     public List<PartialBotApiMethod<? extends Serializable>> handle(Update update) {
         try {
+            if (update.hasInlineQuery()){
+                System.out.println(update.getInlineQuery());
+                System.out.println("Query = "+update.getInlineQuery().getQuery());
+                final Long chatId = update.getInlineQuery().getFrom().getId();
+
+                final TelegramUser user = telegramUserRepository.findById(chatId)
+                        .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getMessage().getFrom())));
+                return handleIncomingInlineQuery(user,update.getInlineQuery());
+            }
+
             if (isMessageWithText(update)) {
 
                 final Message message = update.getMessage();
@@ -85,7 +116,7 @@ public class UpdateReceiver {
 //                user.setAction(addAction(user, message).trim());
 //                System.out.println(user.getAction());
 //                User save = userRepository.save(user);
-                return getHandlerByCallBackQuery(callbackQuery.getData(),user).handle(user, callbackQuery);
+                return getHandlerByCallBackQuery(TelegramUtil.parseString(callbackQuery.getData(),0),user).handle(user, callbackQuery);
 //
 //                }
 

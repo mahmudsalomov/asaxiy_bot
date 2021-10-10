@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
+import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,7 +32,16 @@ public class Product implements Handler{
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, CallbackQuery callback) throws IOException {
         String text=callback.getData();
-        return Collections.singletonList(messageTemplate.category(user,1));
+        String[] parseString = TelegramUtil.parseString(text);
+        if (parseString[0].equals("c")){
+            return Collections.singletonList(messageTemplate.category(user,Integer.parseInt(parseString[1]),Integer.parseInt(parseString[2])));
+        }
+
+//        if (parseString[0].equals("p")){
+//            return Collections.singletonList(messageTemplate.productByCategory(user,Integer.parseInt(parseString[1]),Integer.parseInt(parseString[2])));
+//        }
+
+        return Collections.singletonList(messageTemplate.category(user,1,1));
     }
 
     @Override
@@ -43,6 +53,7 @@ public class Product implements Handler{
     public List<String> operatedCallBackQuery(TelegramUser user) {
         List<String> result=new ArrayList<>();
         result.add(State.PRODUCT.name());
+        result.add("c");
         return result;
     }
 }

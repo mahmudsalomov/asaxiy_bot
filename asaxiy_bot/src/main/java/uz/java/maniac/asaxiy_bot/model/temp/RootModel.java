@@ -22,8 +22,20 @@ public class RootModel {
         this.root = root;
         this.categories = root.getData().getCategories();
         this.brands=root.getData().getBrands();
-
         System.out.println("Seeeeeeeet = "+categories.size());
         return this;
+    }
+
+    public List<Category> getChildren(int id, RootModel root){
+        Category category = categoryFinder(id, root.categories);
+        if (category==null) return null;
+        return category.children;
+    }
+
+    public Category categoryFinder(int id, List<Category> categories){
+        for (Category category : categories) {
+            if (category.id == id) return category;
+        }
+        return null;
     }
 }

@@ -8,6 +8,7 @@ import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.InlineKeyboardModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -75,6 +76,24 @@ public class TelegramUtil {
         return pageList;
     }
 
+
+    public static String parseString(String str,int index){
+        try {
+            String[] parts = str.split("-");
+            System.out.println(Arrays.toString(parts));
+            if (index<0||parts.length<=index) return "";
+            return parts[index];
+        }catch (Exception e){
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String[] parseString(String str){
+            String[] parts = str.split("-");
+            System.out.println(Arrays.toString(parts));
+            return parts;
+    }
 
 //    public static String parseName(User user){
 //        String str=" ";

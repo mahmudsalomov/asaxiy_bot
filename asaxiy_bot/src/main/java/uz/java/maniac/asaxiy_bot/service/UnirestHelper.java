@@ -7,10 +7,12 @@ import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.java.maniac.asaxiy_bot.model.Lang;
-import uz.java.maniac.asaxiy_bot.model.json.Category;
-import uz.java.maniac.asaxiy_bot.model.json.Root;
-import uz.java.maniac.asaxiy_bot.model.json.SubRoot;
+import uz.java.maniac.asaxiy_bot.model.TelegramUser;
+import uz.java.maniac.asaxiy_bot.model.json.*;
 import uz.java.maniac.asaxiy_bot.model.temp.RootModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UnirestHelper {
@@ -33,6 +35,7 @@ public class UnirestHelper {
 //            }
 //            root.data.categories.forEach(c-> System.out.println(c.getId()+" = "+c.children.size()));
 
+            System.out.println(root.data.categories.get(0).name);
 
             if (root.getStatus()==1)
 //            rootModel.setRootCategory(root);
@@ -64,6 +67,21 @@ public class UnirestHelper {
         }
     }
 
+
+    public List<Product> getProductByCategory(Lang lang,int category_id){
+        List<Integer> cs=new ArrayList<>();
+        cs.add(category_id);
+        ProductPostData data= ProductPostData
+                .builder()
+                .categories(cs)
+                .sort_by(-1)
+                .build();
+        HttpResponse<JsonNode> response = Unirest.post(Urls.product).body(data).header("language",lang.name().toLowerCase()).asJson();
+        Gson gson = new Gson();
+        String responseJSONString = response.getBody().toString();
+        ProductRoot root = gson.fromJson(responseJSONString, ProductRoot.class);
+        return root.data;
+    }
 
 
 }

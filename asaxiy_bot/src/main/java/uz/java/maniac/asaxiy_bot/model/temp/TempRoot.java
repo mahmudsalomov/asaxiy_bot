@@ -31,9 +31,9 @@ public class TempRoot {
         Root rootUZ = helper.getRootCategory(Lang.UZ);
         Root rootOZ = helper.getRootCategory(Lang.OZ);
         Root rootRU =  helper.getRootCategory(Lang.RU);
-        if (rootUZ != null) this.rootUZ=rootModel.setRootCategory(rootUZ);
-        if (rootOZ != null) this.rootOZ=rootModel.setRootCategory(rootOZ);
-        if (rootRU != null) this.rootRU=rootModel.setRootCategory(rootRU);
+        if (rootUZ != null) this.rootUZ=new RootModel().setRootCategory(rootUZ);
+        if (rootOZ != null) this.rootOZ=new RootModel().setRootCategory(rootOZ);
+        if (rootRU != null) this.rootRU=new RootModel().setRootCategory(rootRU);
 
         if (rootOZ != null) {
             for (int i = 0; i <rootOZ.data.categories.size() ; i++) {
@@ -47,7 +47,7 @@ public class TempRoot {
 
                         System.out.println(" Ota = "+rootOZ.data.categories.get(i).getId()+" ****************");
                         rootOZ.data.categories.get(i).children.forEach(c->System.out.println("sub "+c.id));
-                        Thread.sleep(10000);
+                        Thread.sleep(1000);
                     }
                 }
 
@@ -66,7 +66,7 @@ public class TempRoot {
                         System.out.println(" Ota = "+rootUZ.data.categories.get(i).getId()+" ****************");
                         rootUZ.data.categories.get(i).children.forEach(c->System.out.println("sub "+c.id));
 
-                        Thread.sleep(10000);
+                        Thread.sleep(1000);
                     }
                 }
 
@@ -84,7 +84,7 @@ public class TempRoot {
 
                         System.out.println(" Ota = "+rootRU.data.categories.get(i).getId()+" ****************");
                         rootRU.data.categories.get(i).children.forEach(c->System.out.println("sub "+c.id));
-                        Thread.sleep(10000);
+                        Thread.sleep(1000);
                     }
                 }
             }
