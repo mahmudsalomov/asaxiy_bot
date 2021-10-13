@@ -19,7 +19,12 @@ public enum Translations {
             "Асахий ботига хуш келибсиз. Марҳамат хизмат турини танланг",
             "Asaxiy botiga xush kelibsiz. Marhamat xizmat turini tanlang!",
             "Добро пожаловать в asaxiy bot. Пожалуйста, выберите тип услуги")
-    ;
+    ,
+    Price(
+            "\uD83D\uDCB8 Нархи",
+            "\uD83D\uDCB8 Narxi",
+            "\uD83D\uDCB8 Цена"
+    );
 
 
 

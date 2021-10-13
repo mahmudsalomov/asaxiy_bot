@@ -4,14 +4,14 @@ import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.java.maniac.asaxiy_bot.model.Lang;
-import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.json.*;
-import uz.java.maniac.asaxiy_bot.model.temp.RootModel;
+import uz.java.maniac.asaxiy_bot.model.json.product.Product;
+import uz.java.maniac.asaxiy_bot.model.json.product.RootProduct;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -68,20 +68,95 @@ public class UnirestHelper {
     }
 
 
-    public List<Product> getProductByCategory(Lang lang,int category_id){
+    public List<ProductSmall> getProductByCategory(Lang lang, int category_id){
         List<Integer> cs=new ArrayList<>();
         cs.add(category_id);
-        ProductPostData data= ProductPostData
+        ProductsPostData data= ProductsPostData
                 .builder()
                 .categories(cs)
                 .sort_by(-1)
                 .build();
-        HttpResponse<JsonNode> response = Unirest.post(Urls.product).body(data).header("language",lang.name().toLowerCase()).asJson();
+        HttpResponse<JsonNode> response = Unirest.post(Urls.products).body(data).header("language",lang.name().toLowerCase()).asJson();
         Gson gson = new Gson();
         String responseJSONString = response.getBody().toString();
-        ProductRoot root = gson.fromJson(responseJSONString, ProductRoot.class);
+        ProductsRoot root = gson.fromJson(responseJSONString, ProductsRoot.class);
         return root.data;
     }
+
+
+    public Product getProduct(Lang lang, int id){
+        HttpResponse<JsonNode> response = Unirest.get(Urls.product+id).header("language",lang.name().toLowerCase()).asJson();
+        Gson gson = new Gson();
+        String responseJSONString = response.getBody().toString();
+        System.out.println(responseJSONString);
+        RootProduct root = gson.fromJson(responseJSONString, RootProduct.class);
+        return root.data;
+    }
+
+
+    /** Search **/
+    public List<ProductSmall> searchByCategory(Lang lang, int category_id, String keyword){
+        try {
+            ProductsPostData search=ProductsPostData
+                    .builder()
+                    .search_key(keyword)
+                    .categories(Collections.singletonList(category_id))
+                    .brands(new ArrayList<>())
+                    .options(new ArrayList<>())
+                    .sort_by(-1)
+                    .build();
+            System.out.println(search);
+            HttpResponse<JsonNode> response = Unirest.post(Urls.products).body(search).header("language",lang.name()).asJson();
+            Gson gson = new Gson();
+            String responseJSONString = response.getBody().toString();
+            System.out.println("Lang = "+lang);
+            System.out.println(response.getBody());
+            ProductsRoot root = gson.fromJson(responseJSONString, ProductsRoot.class);
+            System.out.println(root.data);
+
+            if (root.getStatus()==1)
+             return root.data;
+    }catch (Exception e){
+            e.printStackTrace();
+            return null;
+    }
+        return null;
+    }
+
+
+
+    public List<ProductSmall> searchByName(Lang lang, String keyword){
+        try {
+            ProductsPostData search=ProductsPostData
+                    .builder()
+                    .search_key(keyword)
+                    .categories(new ArrayList<>())
+                    .brands(new ArrayList<>())
+                    .options(new ArrayList<>())
+                    .sort_by(-1)
+                    .build();
+            System.out.println(search);
+            HttpResponse<JsonNode> response = Unirest.get(Urls.search+keyword+"&partner=true").header("language",lang.name()).asJson();
+            Gson gson = new Gson();
+            String responseJSONString = response.getBody().toString();
+            System.out.println("Lang = "+lang);
+            System.out.println(response.getBody());
+            ProductsRoot root = gson.fromJson(responseJSONString, ProductsRoot.class);
+            System.out.println(root.data);
+
+            if (root.getStatus()==1)
+                return root.data;
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
+
+
+
+
 
 
 }

@@ -18,6 +18,7 @@
     </properties>
     <dependencies>
 
+
         <!-- Pull in as a traditional dependency -->
         <dependency>
             <groupId>com.konghq</groupId>

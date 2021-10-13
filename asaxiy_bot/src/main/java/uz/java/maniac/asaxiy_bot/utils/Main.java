@@ -3,11 +3,10 @@ package uz.java.maniac.asaxiy_bot.utils;
 import com.google.gson.Gson;
 import uz.java.maniac.asaxiy_bot.model.Lang;
 import uz.java.maniac.asaxiy_bot.model.State;
-import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.callback.Callback;
 import uz.java.maniac.asaxiy_bot.model.callback.Key;
 import uz.java.maniac.asaxiy_bot.model.json.Category;
-import uz.java.maniac.asaxiy_bot.model.json.ProductPostData;
+import uz.java.maniac.asaxiy_bot.model.json.ProductsPostData;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class Main {
         List<Integer> cs=new ArrayList<>();
         cs.add(96);
         cs.add(170);
-        ProductPostData data= ProductPostData
+        ProductsPostData data= ProductsPostData
                 .builder()
                 .categories(cs)
                 .build();

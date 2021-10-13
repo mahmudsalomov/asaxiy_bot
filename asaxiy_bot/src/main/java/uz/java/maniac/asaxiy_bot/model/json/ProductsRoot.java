@@ -8,7 +8,7 @@ import java.util.List;
 @lombok.Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRoot {
+public class ProductsRoot {
     public int status;
-    public List<Product> data;
+    public List<ProductSmall> data;
 }

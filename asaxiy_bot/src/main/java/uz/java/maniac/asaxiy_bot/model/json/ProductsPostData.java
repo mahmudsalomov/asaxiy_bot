@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductPostData {
+public class ProductsPostData {
     public List<Integer> categories;
     public List<Integer> brands;
     public int min_price;

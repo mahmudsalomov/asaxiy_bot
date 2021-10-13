@@ -37,9 +37,9 @@ public class Product implements Handler{
             return Collections.singletonList(messageTemplate.category(user,Integer.parseInt(parseString[1]),Integer.parseInt(parseString[2])));
         }
 
-//        if (parseString[0].equals("p")){
-//            return Collections.singletonList(messageTemplate.productByCategory(user,Integer.parseInt(parseString[1]),Integer.parseInt(parseString[2])));
-//        }
+        if (parseString[0].equals("p")){
+            return Collections.singletonList(messageTemplate.product(user,Integer.parseInt(parseString[1])));
+        }
 
         return Collections.singletonList(messageTemplate.category(user,1,1));
     }
@@ -54,6 +54,7 @@ public class Product implements Handler{
         List<String> result=new ArrayList<>();
         result.add(State.PRODUCT.name());
         result.add("c");
+        result.add("p");
         return result;
     }
 }

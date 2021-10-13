@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import uz.java.maniac.asaxiy_bot.bot.handler.Handler;
+import uz.java.maniac.asaxiy_bot.bot.handler.Search;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
@@ -70,7 +71,8 @@ public class UpdateReceiver {
 
                 final TelegramUser user = telegramUserRepository.findById(chatId)
                         .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getMessage().getFrom())));
-                return handleIncomingInlineQuery(user,update.getInlineQuery());
+                Search search= (Search) getHandlerByState(State.SEARCH);
+                return search.handle(user,update.getInlineQuery());
             }
 
             if (isMessageWithText(update)) {

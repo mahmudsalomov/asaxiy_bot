@@ -6,5 +6,6 @@ public enum State {
     PROMOTIONS,
     BASKET,
     PROFILE,
-    START
+    START,
+    SEARCH
 }

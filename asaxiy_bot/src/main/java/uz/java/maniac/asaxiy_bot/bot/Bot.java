@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
+import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -129,6 +130,8 @@ public class Bot extends TelegramLongPollingBot {
                     executeWithExceptionCheck((EditMessageReplyMarkup) response);
                 }else if (response instanceof AnswerCallbackQuery){
                     executeWithExceptionCheck((AnswerCallbackQuery) response);
+                } else if (response instanceof AnswerInlineQuery){
+                    executeWithExceptionCheck((AnswerInlineQuery) response);
                 }
 
             });
@@ -171,6 +174,15 @@ public class Bot extends TelegramLongPollingBot {
     public void executeWithExceptionCheck(SendPhoto sendMessage) {
         try {
             execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            log.error("oops");
+        }
+    }
+
+    public void executeWithExceptionCheck(AnswerInlineQuery answerInlineQuery) {
+        try {
+            execute(answerInlineQuery);
         } catch (TelegramApiException e) {
             e.printStackTrace();
             log.error("oops");

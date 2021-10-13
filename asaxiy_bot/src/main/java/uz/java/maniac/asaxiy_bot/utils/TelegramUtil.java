@@ -27,7 +27,7 @@ public class TelegramUtil {
         return message;
     }
 
-//    public static SendPhoto createPhotoTemplate(Integer chatId){
+//    public static SendPhoto createPhotoTemplate(Long chatId){
 //        return new SendPhoto().setChatId(String.valueOf(chatId));
 //    }
 
@@ -93,6 +93,15 @@ public class TelegramUtil {
             String[] parts = str.split("-");
             System.out.println(Arrays.toString(parts));
             return parts;
+    }
+
+    public static boolean isInt(String str){
+        try {
+            Integer.parseInt(str);
+            return true;
+        }catch (NumberFormatException e){
+            return false;
+        }
     }
 
 //    public static String parseName(User user){
