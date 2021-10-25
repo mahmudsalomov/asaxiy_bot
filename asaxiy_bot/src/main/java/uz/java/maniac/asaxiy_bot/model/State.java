@@ -7,5 +7,7 @@ public enum State {
     BASKET,
     PROFILE,
     START,
-    SEARCH
+    SEARCH,
+    ORDER,
+    ORDER_PROCESS
 }

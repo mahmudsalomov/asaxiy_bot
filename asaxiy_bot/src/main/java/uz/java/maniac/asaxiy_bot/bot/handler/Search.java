@@ -17,6 +17,7 @@ import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.json.ProductSmall;
 import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
+import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 import uz.java.maniac.asaxiy_bot.translations.Translations;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
@@ -33,6 +34,8 @@ import java.util.List;
 public class Search implements Handler{
     @Autowired
     private UnirestHelper helper;
+    @Autowired
+    private TelegramUserRepository telegramUserRepository;
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
         return null;
@@ -65,33 +68,56 @@ public class Search implements Handler{
             products=helper.searchByName(user.getLang(),inlineQuery.getQuery());
         }
 
-        for (ProductSmall product : products) {
-            MessageTemplate messageTemplate=new MessageTemplate();
+        if (products==null||products.size()==0){
+            InputTextMessageContent messageContent= InputTextMessageContent
+                    .builder()
+//                    .entities(Collections.singletonList(messageEntity))
+                    .messageText("Hech narsa topilmadi")
+//                    .parseMode(ParseMode.MARKDOWN)
+                    .build();
+            InlineQueryResultArticle article= InlineQueryResultArticle
+                    .builder()
+                    .description("")
+                    .id("0")
+                    .title("Hech narsa topilmadi!")
+                    .inputMessageContent(messageContent)
+                    .build();
+            results.add(article);
+        }
+        else {
+            for (ProductSmall product : products) {
+                MessageTemplate messageTemplate=new MessageTemplate();
 //            SendPhoto sendPhoto = messageTemplate.product(user, product.id);
 //
 //            MessageEntity messageEntity=new MessageEntity();
 //            messageEntity.setLanguage(user.getLang().name());
 //            messageEntity.setText("AAAA");
 
+                user.setState(State.START);
 
-            InputTextMessageContent messageContent= InputTextMessageContent
-                    .builder()
+                InputTextMessageContent messageContent= InputTextMessageContent
+                        .builder()
 //                    .entities(Collections.singletonList(messageEntity))
-                    .messageText(product.getImage().toString())
+                        .messageText(product.getImage().toString())
 //                    .parseMode(ParseMode.MARKDOWN)
-                    .build();
-            InlineQueryResultArticle article= InlineQueryResultArticle
-                    .builder()
-                    .description(Translations.Price.get(user.getLang()) +" : "+product.price)
-                    .title(product.getName())
-                    .thumbUrl(product.getImage())
-                    .id(String.valueOf(product.getId()))
-                    .replyMarkup(new Col("a","a").getMarkup())
+                        .build();
+                InlineQueryResultArticle article= InlineQueryResultArticle
+                        .builder()
+                        .description(Translations.Price.get(user.getLang()) +" : "+product.price)
+                        .title(product.getName())
+                        .thumbUrl(product.getImage())
+                        .id(String.valueOf(product.getId()))
+                        .replyMarkup(messageTemplate.productSearchKeyboard(product.id, user))
 //                    .hideUrl(true)
-                    .inputMessageContent(messageContent)
-                    .build();
-            results.add(article);
+                        .inputMessageContent(messageContent)
+                        .build();
+                results.add(article);
+
+            }
         }
+
+
+
 
         answer.setInlineQueryId(inlineQuery.getId());
         answer.setResults(results);

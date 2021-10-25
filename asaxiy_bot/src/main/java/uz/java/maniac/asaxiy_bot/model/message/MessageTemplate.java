@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.java.maniac.asaxiy_bot.model.Lang;
 import uz.java.maniac.asaxiy_bot.model.State;
@@ -53,12 +54,12 @@ public class MessageTemplate {
     public SendMessage langChoice(TelegramUser user){
         try {
             Row row=new Row();
-            row.add("\uD83C\uDDFA\uD83C\uDDFF O'z", Lang.OZ.name());
-            row.add("\uD83C\uDDFA\uD83C\uDDFF Ўз", Lang.UZ.name());
+            row.add("\uD83C\uDDFA\uD83C\uDDFF Ўз", Lang.OZ.name());
+            row.add("\uD83C\uDDFA\uD83C\uDDFF O'z", Lang.UZ.name());
             row.add("\uD83C\uDDF7\uD83C\uDDFA Ru", Lang.RU.name());
             SendMessage messageTemplate = createMessageTemplate(user);
             messageTemplate.setReplyMarkup(row.getMarkup());
-            messageTemplate.setText("Tilni tanlang!\nТилни танланг!\nВыберите язык!");
+            messageTemplate.setText("\uD83C\uDDFA\uD83C\uDDFFТилни танланг!\n\uD83C\uDDFA\uD83C\uDDFFTilni tanlang!\n\uD83C\uDDF7\uD83C\uDDFAВыберите язык!");
             messageTemplate.enableMarkdown(true);
             return messageTemplate;
         }catch (Exception e){
@@ -113,8 +114,8 @@ public class MessageTemplate {
                         .text(Search.get(user))
                         .build();
                 col.add(search);
-                col.add("\uD83D\uDD19 Orqaga");
-                col.add("\uD83C\uDFD8 Bosh sahifa","EXIT");
+                col.add(BackBtn.get(user));
+                col.add(MainMenuBtn.get(user),"EXIT");
                 return SendMessage
                         .builder()
                         .chatId(String.valueOf(user.getId()))
@@ -136,6 +137,8 @@ public class MessageTemplate {
     public SendMessage category(TelegramUser user,int id, int page){
         TestInterface<Category> util=new TestInterface<>();
 
+        if (id<=0) return mainMenu(user);
+
         RootModel rootModel=tempRoot.get(user.getLang());
 //        if (id==1){
 //            if (rootModel.categories.size()>0){
@@ -152,7 +155,12 @@ public class MessageTemplate {
                     Col col=new Col();
                     List<Category> categories=rootModel.categories;
                     List<Category> subList= util.pageable(categories,page,6);
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6));
+
+                    boolean last=false;
+                    boolean first=false;
+                    if (util.totalPages(categories,6)<=page) last=true;
+                    if (1>=page) first=true;
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last);
 //                    subList.forEach(c->col.add(c.getName(),"c-"+c.getId()+"-1"));
 //
 //                    Row row=new Row();
@@ -170,7 +178,11 @@ public class MessageTemplate {
                     Root root =helper.getRootCategory(user.getLang());
                     if (root.data.categories.size()>0){
                         List<Category> subList= util.pageable(root.data.categories,page,6);
-                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6));
+                        boolean last=false;
+                        boolean first=false;
+                        if (util.totalPages(root.data.categories,6)<=page) last=true;
+                        if (1>=page) first=true;
+                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6),first,last);
                     }
                     return null;
                 }
@@ -187,7 +199,11 @@ public class MessageTemplate {
 
                 if (categories.size()>0){
                     List<Category> subList= util.pageable(categories,page,6);
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6));
+                    boolean last=false;
+                    boolean first=false;
+                    if (util.totalPages(categories,6)<=page) last=true;
+                    if (1>=page) first=true;
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last);
                 }
 
                 return null;
@@ -201,13 +217,16 @@ public class MessageTemplate {
     }
 
 
-    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages){
+    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages,boolean first, boolean last){
         try {
             if (page<=0||page>totalPages) return null;
             Col col=new Col();
             categories.forEach(c->col.add(c.getName(),"c-"+c.getId()+"-1"));
             Row row=new Row();
+
+            if (!first)
             row.add("⬅️️","c-"+id+"-"+(page-1));
+            else row.add("⏹");
 
 
             InlineKeyboardButton search= InlineKeyboardButton
@@ -218,10 +237,12 @@ public class MessageTemplate {
             row.add(search);
 
 
+            if (!last)
             row.add("➡️","c-"+id+"-"+(page+1));
+            else row.add("⏹");
             col.add(row);
 
-            col.add(BackBtn.get(user.getLang()));
+            col.add(BackBtn.get(user.getLang()),"c-"+id+"-1");
             col.add(MainMenuBtn.get(user.getLang()),"EXIT");
             return SendMessage
                     .builder()
@@ -236,11 +257,48 @@ public class MessageTemplate {
     }
 
 
+    public InlineKeyboardMarkup productKeyboard(Integer product_id, TelegramUser user){
+        Col col=new Col();
+        Row row=new Row();
+
+
+        row.add("➖","p-"+product_id+"-minus");
+        row.add("1","p-"+product_id);
+        row.add("➕","p-"+product_id+"-plus");
+        col.add(row);
+        row.clear();
+//                row.add("✅ Buyurtma berish","add_order");
+        row.add(AddBasket.get(user),"addBasket-"+product_id+"-1");
+        col.add(row);
+//                    col.add("\uD83D\uDD19 Orqaga","backTo");
+        col.add(BackBtn.get(user),"c-"+user.getCurrent_category_id()+"-1");
+        col.add(MainMenuBtn.get(user),"EXIT");
+        return col.getMarkup();
+    }
+
+
+    public InlineKeyboardMarkup productSearchKeyboard(Integer product_id, TelegramUser user){
+        Col col=new Col();
+        Row row=new Row();
+        row.add("➖","p-"+product_id+"-minus");
+        row.add("1","p-"+product_id);
+        row.add("➕","p-"+product_id+"-plus");
+        col.add(row);
+        row.clear();
+//                row.add("✅ Buyurtma berish","add_order");
+        row.add(AddBasket.get(user),"addBasket-"+product_id+"-1");
+        col.add(row);
+//                    col.add("\uD83D\uDD19 Orqaga","backTo");
+//        col.add(BackBtn.get(user),"c-"+user.getCurrent_category_id()+"-1");
+        col.add(MainMenuBtn.get(user),"EXIT");
+        return col.getMarkup();
+    }
+
 
     public SendPhoto product(TelegramUser user, int id){
         try {
-            Col col=new Col();
-            Row row=new Row();
+//            Col col=new Col();
+//            Row row=new Row();
             Product product = helper.getProduct(user.getLang(), id);
 
 //            Optional<ProductSmall> product = productRepository.findById(Long.valueOf(prodId));
@@ -273,17 +331,17 @@ public class MessageTemplate {
 
 
 
-                row.add("➖","p-"+id+"-minus");
-                row.add("1","p-"+id);
-                row.add("➕","p-"+id+"-plus");
-                col.add(row);
-                row.clear();
-//                row.add("✅ Buyurtma berish","add_order");
-                row.add("\uD83D\uDED2 Savatga joylash","addBasket-"+id+"-1");
-                col.add(row);
-//                    col.add("\uD83D\uDD19 Orqaga","backTo");
-                col.add("\uD83D\uDD19 Orqaga","catId-"+user.getCurrent_category_id());
-                col.add("\uD83C\uDFD8 Bosh sahifa","EXIT");
+//                row.add("➖","p-"+id+"-minus");
+//                row.add("1","p-"+id);
+//                row.add("➕","p-"+id+"-plus");
+//                col.add(row);
+//                row.clear();
+////                row.add("✅ Buyurtma berish","add_order");
+//                row.add("\uD83D\uDED2 Savatga joylash","addBasket-"+id+"-1");
+//                col.add(row);
+////                    col.add("\uD83D\uDD19 Orqaga","backTo");
+//                col.add("\uD83D\uDD19 Orqaga","catId-"+user.getCurrent_category_id());
+//                col.add("\uD83C\uDFD8 Bosh sahifa","EXIT");
                 System.out.println(product.getMain_image());
                 URL url=new URL(product.getMain_image());
                 URLConnection connection=url.openConnection();
@@ -293,8 +351,14 @@ public class MessageTemplate {
                     InputFile file=new InputFile();
                     file.setMedia(connection.getInputStream(),"Photo");
                     photoTemplate.setPhoto(file);
-                    photoTemplate.setCaption(product.getName()+"\n\nNarxi: "+product.getActual_price());
-                    photoTemplate.setReplyMarkup(col.getMarkup());
+                    photoTemplate.setCaption(product.getName()+Price.get(user)+product.getActual_price());
+
+
+                    photoTemplate.setReplyMarkup(productKeyboard(id,user));
+
+
+
+
                     return photoTemplate;
 //                    return createPhotoTemplate(user.getId()).setPhoto(
 //                            "Photo",connection.getInputStream()
@@ -319,7 +383,11 @@ public class MessageTemplate {
             TestInterface<ProductSmall> util=new TestInterface<>();
             List<ProductSmall> productSmallList = helper.getProductByCategory(user.getLang(), category_id);
             List<ProductSmall> subList= util.pageable(productSmallList,page,6);
-            return productMessageBuilder(user,subList,page,util.totalPages(productSmallList,6),category_id);
+            boolean last=false;
+            boolean first=false;
+            if (util.totalPages(productSmallList,6)<=page) last=true;
+            if (1>=page) first=true;
+            return productMessageBuilder(user,subList,page,util.totalPages(productSmallList,6),category_id,first,last);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -329,13 +397,17 @@ public class MessageTemplate {
 
 
 
-    protected SendMessage productMessageBuilder(TelegramUser user, List<ProductSmall> products, int page, int totalPages, int category_id){
+    protected SendMessage productMessageBuilder(TelegramUser user, List<ProductSmall> products, int page, int totalPages, int category_id,boolean first, boolean last){
         try {
             if (page<=0||page>totalPages) return null;
             Col col=new Col();
             products.forEach(p->col.add(p.getName(),"p-"+p.getId()+"-1"));
             Row row=new Row();
-            row.add("⬅️️","c-"+category_id+"-"+(page-1));
+
+
+            if (!first)
+                row.add("⬅️️","c-"+category_id+"-"+(page-1));
+            else row.add("⏹");
 
             InlineKeyboardButton search = InlineKeyboardButton
                     .builder()
@@ -344,10 +416,12 @@ public class MessageTemplate {
                     .build();
             row.add(search);
 
-            row.add("➡️","c-"+category_id+"-"+(page+1));
+            if (!last)
+                row.add("➡️","c-"+category_id+"-"+(page+1));
+            else row.add("⏹");
             col.add(row);
 
-            col.add(BackBtn.get(user.getLang()));
+            col.add(BackBtn.get(user.getLang()),"c-"+category_id+"-1");
             col.add(MainMenuBtn.get(user.getLang()),"EXIT");
             return SendMessage
                     .builder()

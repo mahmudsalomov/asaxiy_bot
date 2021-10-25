@@ -1,18 +1,38 @@
 package uz.java.maniac.asaxiy_bot.bot.handler;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import uz.java.maniac.asaxiy_bot.model.ProfileEnum;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
+import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
+import uz.java.maniac.asaxiy_bot.service.TelegramUserService;
+import uz.java.maniac.asaxiy_bot.translations.Translations;
+import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
+
 @Component
 public class Profile implements Handler{
+    @Autowired
+    private TelegramUserService userService;
+
+
+    @Autowired
+    private Start start;
+
+    @Autowired
+    private TelegramUserRepository telegramUserRepository;
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
         return null;
@@ -20,6 +40,25 @@ public class Profile implements Handler{
 
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, CallbackQuery callback) throws IOException {
+
+
+        if (callback.getData().equals(State.PROFILE.name())){
+            Col col = new Col();
+            col.add(Translations.MyOrdersBtn.get(user),ProfileEnum.MY_ORDERS.name());
+            col.add(Translations.MyLanguageBtn.get(user),ProfileEnum.MY_LANGUAGE.name());
+//            col.add(ProfileMenuStrings.map_oz.get(ProfileEnums.MY_REGION.name()),ProfileEnums.MY_REGION.name());
+            col.add(Translations.MainMenuBtn.get(user),"EXIT");
+            SendMessage sendMessage = createMessageTemplate(user);
+            sendMessage.setText("Salom "+user.getUsername()+" "+user.getFirstname()+" "+user.getLastname());
+            sendMessage.setReplyMarkup(col.getMarkup());
+            return Collections.singletonList(sendMessage);
+        }
+
+        if (callback.getData().equals(ProfileEnum.MY_LANGUAGE.name())) {
+            user.setLang(null);
+            user=telegramUserRepository.save(user);
+            return start.handle(user,callback.getData());
+        }
         return null;
     }
 
@@ -30,6 +69,9 @@ public class Profile implements Handler{
 
     @Override
     public List<String> operatedCallBackQuery(TelegramUser user) {
-        return Collections.emptyList();
+        List<String> result=new ArrayList<>();
+        result.add(State.PROFILE.name());
+        result.add(ProfileEnum.MY_LANGUAGE.name());
+        return result;
     }
 }
