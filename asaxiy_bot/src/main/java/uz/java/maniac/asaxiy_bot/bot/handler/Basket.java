@@ -181,7 +181,9 @@ public class Basket implements Handler{
 
 
         System.out.println("SAVATCHA");
-        return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
+        List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), col.getMarkup());
+//        return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
+        return list;
     }
 
     @Override
