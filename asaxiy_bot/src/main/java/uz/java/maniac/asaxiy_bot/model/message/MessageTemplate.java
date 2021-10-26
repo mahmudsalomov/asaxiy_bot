@@ -3,6 +3,7 @@ package uz.java.maniac.asaxiy_bot.model.message;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -416,12 +417,16 @@ public class MessageTemplate {
                 URL url=new URL(product.getMain_image());
                 URLConnection connection=url.openConnection();
                 try {
+                    String src="<a href=\"http://localhost:8081/view/"+product.id+"/"+user.getLang()+"\"></a>";
                     SendPhoto photoTemplate = new SendPhoto();
                     photoTemplate.setChatId(String.valueOf(user.getId()));
                     InputFile file=new InputFile();
                     file.setMedia(connection.getInputStream(),"Photo");
                     photoTemplate.setPhoto(file);
-                    photoTemplate.setCaption(product.getName()+Price.get(user)+product.getActual_price());
+                    photoTemplate.setParseMode(ParseMode.HTML);
+                    photoTemplate.setCaption(product.getName()+"\n"+Price.get(user)+product.getActual_price()+" \n"+
+                            src
+                            );
 
 
                     photoTemplate.setReplyMarkup(productKeyboard(id,user));
