@@ -93,7 +93,7 @@ public class MessageTemplate {
     public List<PartialBotApiMethod<? extends Serializable>> editTextAndReplyMarkup(TelegramUser user,Integer messageId,String text,InlineKeyboardMarkup markup){
 
         List<PartialBotApiMethod<? extends Serializable>> list=new ArrayList<>();
-//        list.add(editText(user, text, messageId));
+        list.add(editText(user, text, messageId));
         list.add(editReplyMarkup(user, markup, messageId));
         return list;
 

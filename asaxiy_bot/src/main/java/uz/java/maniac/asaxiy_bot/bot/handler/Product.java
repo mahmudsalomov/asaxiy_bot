@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import uz.java.maniac.asaxiy_bot.model.State;
@@ -43,9 +44,10 @@ public class Product implements Handler{
 //            editMessageReplyMarkup.setReplyMarkup((InlineKeyboardMarkup) sendMessage.getReplyMarkup());
 //            messageTemplate.editText(user,sendMessage.getText(),callback.getMessage().getMessageId());
 //            messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId());
-            List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), (InlineKeyboardMarkup) sendMessage.getReplyMarkup());
+//            List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), (InlineKeyboardMarkup) sendMessage.getReplyMarkup());
 //            return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
-            return list;
+            EditMessageReplyMarkup replyMarkup = messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(), callback.getMessage().getMessageId());
+            return Collections.singletonList(replyMarkup);
         }
 
         if (parseString[0].equals("p")){
