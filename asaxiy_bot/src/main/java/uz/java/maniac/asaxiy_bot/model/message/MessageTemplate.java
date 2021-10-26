@@ -365,6 +365,56 @@ public class MessageTemplate {
         return col.getMarkup();
     }
 
+    public SendMessage productWithMessage(TelegramUser user, int id){
+        try {
+//            Col col=new Col();
+//            Row row=new Row();
+            Product product = helper.getProduct(user.getLang(), id);
+
+//            Optional<ProductSmall> product = productRepository.findById(Long.valueOf(prodId));
+            if (product!=null){
+
+                System.out.println(product.getMain_image());
+//                URL url=new URL(product.getMain_image());
+//                URLConnection connection=url.openConnection();
+                try {
+                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
+//                    String src="<a href='https://www.youtube.com/watch?v=u_6eufrgceI'>aa</a>";
+                    SendMessage photoTemplate = new SendMessage();
+                    photoTemplate.setChatId(String.valueOf(user.getId()));
+//                    InputFile file=new InputFile();
+//                    file.setMedia(connection.getInputStream(),"Photo");
+//                    photoTemplate.setPhoto(file);
+                    photoTemplate.setParseMode(ParseMode.HTML);
+//                    photoTemplate.setCaption(product.getName()+"\n"+Price.get(user)+product.getActual_price()+" \n");
+//                    photoTemplate.setCaption(nameMessage(product.description));
+                    photoTemplate.setDisableWebPagePreview(true);
+
+                    photoTemplate.setText(product.getName()+"\n\n"+Price.get(user)+product.getActual_price()+" \n\n"+
+                            "http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang());
+                    photoTemplate.setText("a\n"+src);
+
+                    photoTemplate.setReplyMarkup(productKeyboard(id,user));
+
+
+
+
+                    return photoTemplate;
+//                    return createPhotoTemplate(user.getId()).setPhoto(
+//                            "Photo",connection.getInputStream()
+//                    ).setCaption(product.getName()+"\n\nNarxi: "+product.getActual_price()).setReplyMarkup(col.getMarkup());
+//
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
 
     public SendPhoto product(TelegramUser user, int id){
         try {
@@ -417,16 +467,15 @@ public class MessageTemplate {
                 URL url=new URL(product.getMain_image());
                 URLConnection connection=url.openConnection();
                 try {
-                    String src="<a href=\"http://localhost:8081/view/"+product.id+"/"+user.getLang()+"\"></a>";
+                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
                     SendPhoto photoTemplate = new SendPhoto();
                     photoTemplate.setChatId(String.valueOf(user.getId()));
                     InputFile file=new InputFile();
                     file.setMedia(connection.getInputStream(),"Photo");
                     photoTemplate.setPhoto(file);
                     photoTemplate.setParseMode(ParseMode.HTML);
-                    photoTemplate.setCaption(product.getName()+"\n"+Price.get(user)+product.getActual_price()+" \n"+
-                            src
-                            );
+                    photoTemplate.setCaption(product.getName()+"\n"+Price.get(user)+product.getActual_price()+" \n\n"+src);
+//                    photoTemplate.setCaption(nameMessage(product.description));
 
 
                     photoTemplate.setReplyMarkup(productKeyboard(id,user));
@@ -451,6 +500,11 @@ public class MessageTemplate {
         return null;
     }
 
+//    public String nameMessage(String str){
+//        String name="";
+//        name=str.replace("_", "\\_").replace("*", "\\*").replace("[", "\\[").replace("`", "\\`");
+//        return name;
+//    }
 
 
     public SendMessage productByCategory(TelegramUser user,int category_id, int page){
