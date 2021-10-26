@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
@@ -39,18 +37,21 @@ public class Product implements Handler{
         if (parseString[0].equals("c")){
             SendMessage sendMessage = messageTemplate.category(user, Integer.parseInt(parseString[1]), Integer.parseInt(parseString[2]));
 
-            EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
-            editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
-            editMessageReplyMarkup.setMessageId(callback.getMessage().getMessageId());
-            editMessageReplyMarkup.setReplyMarkup((InlineKeyboardMarkup) sendMessage.getReplyMarkup());
-
-            return Collections.singletonList(editMessageReplyMarkup);
+//            EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
+//            editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
+//            editMessageReplyMarkup.setMessageId(callback.getMessage().getMessageId());
+//            editMessageReplyMarkup.setReplyMarkup((InlineKeyboardMarkup) sendMessage.getReplyMarkup());
+//            messageTemplate.editText(user,sendMessage.getText(),callback.getMessage().getMessageId());
+//            messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId());
+            List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), (InlineKeyboardMarkup) sendMessage.getReplyMarkup());
+//            return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
+            return list;
         }
 
         if (parseString[0].equals("p")){
 
-            if (parseString[2].equals("minus")||parseString[2].equals("plus")){
-                return change(callback,callback.getFrom(),parseString[2]);
+            if (parseString.length>2&&(parseString[2].equals("minus")||parseString[2].equals("plus"))){
+                return change(callback,user,parseString[2]);
             }
 
             return Collections.singletonList(messageTemplate.product(user,Integer.parseInt(parseString[1])));
@@ -74,10 +75,14 @@ public class Product implements Handler{
     }
 
 
-    protected List<PartialBotApiMethod<? extends Serializable>> change(CallbackQuery callback, User user,String command){
-            EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
-            editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
-            editMessageReplyMarkup.setMessageId(callback.getMessage().getMessageId());
+    protected List<PartialBotApiMethod<? extends Serializable>> change(CallbackQuery callback, TelegramUser user,String command){
+
+//            EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
+//            editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
+//            editMessageReplyMarkup.setMessageId(callback.getMessage().getMessageId());
+
+
+
             System.out.println(callback.getMessage().getReplyMarkup());
 
             InlineKeyboardMarkup markup=callback.getMessage().getReplyMarkup();
@@ -96,8 +101,12 @@ public class Product implements Handler{
             }
             markup.getKeyboard().get(0).get(1).setText(String.valueOf(quantity));
             markup.getKeyboard().get(1).get(0).setCallbackData(s[0]+"-"+s[1]+"-"+quantity);
-            editMessageReplyMarkup.setReplyMarkup(markup);
-            return Collections.singletonList(editMessageReplyMarkup);
+//            editMessageReplyMarkup.setReplyMarkup(markup);
+
+
+
+
+            return Collections.singletonList(messageTemplate.editReplyMarkup(user,markup,callback.getMessage().getMessageId()));
 
     }
 

@@ -1,15 +1,20 @@
 package uz.java.maniac.asaxiy_bot.model.message;
 
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.java.maniac.asaxiy_bot.model.Lang;
+import uz.java.maniac.asaxiy_bot.model.ProfileEnum;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.json.Category;
@@ -19,17 +24,17 @@ import uz.java.maniac.asaxiy_bot.model.json.product.Product;
 import uz.java.maniac.asaxiy_bot.model.temp.RootModel;
 import uz.java.maniac.asaxiy_bot.model.temp.TempRoot;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
+import uz.java.maniac.asaxiy_bot.translations.Translations;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Row;
 import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 import uz.java.maniac.asaxiy_bot.utils.TestInterface;
 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
 //import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createPhotoTemplate;
@@ -41,6 +46,65 @@ public class MessageTemplate {
     private TempRoot tempRoot;
     @Autowired
     UnirestHelper helper;
+
+
+    public SendMessage removeProcess(TelegramUser user){
+        SendMessage sendMessage = createMessageTemplate(user);
+        ReplyKeyboardRemove replyKeyboardRemove=new ReplyKeyboardRemove();
+        replyKeyboardRemove.setRemoveKeyboard(true);
+        sendMessage.setReplyMarkup(replyKeyboardRemove);
+        sendMessage.setAllowSendingWithoutReply(true);
+        sendMessage.setText(StopProcessMsg.get(user));
+        return sendMessage;
+    }
+
+    public SendMessage orders(TelegramUser user){
+        SendMessage sendMessage=createMessageTemplate(user);
+        Col col=new Col();
+        sendMessage.enableMarkdown(true);
+        col.add(BackBtn.get(user), State.PROFILE.name());
+        col.add(MainMenuBtn.get(user.getLang()),"EXIT");
+        sendMessage.setText(EmptyOrders.get(user));
+        sendMessage.setReplyMarkup(col.getMarkup());
+        return sendMessage;
+    }
+
+
+
+    /** Edit messages **/
+    public EditMessageText editText(TelegramUser user,String text,Integer messageId){
+        EditMessageText editMessageText=new EditMessageText();
+        editMessageText.setChatId(String.valueOf(user.getId()));
+        editMessageText.setText(text);
+        editMessageText.enableMarkdown(true);
+        editMessageText.enableWebPagePreview();
+        editMessageText.setMessageId(messageId);
+        return editMessageText;
+    }
+
+    public EditMessageReplyMarkup editReplyMarkup(TelegramUser user,InlineKeyboardMarkup markup,Integer messageId){
+        EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
+        editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
+        editMessageReplyMarkup.setMessageId(messageId);
+        editMessageReplyMarkup.setReplyMarkup(markup);
+        return editMessageReplyMarkup;
+    }
+
+    public List<PartialBotApiMethod<? extends Serializable>> editTextAndReplyMarkup(TelegramUser user,Integer messageId,String text,InlineKeyboardMarkup markup){
+
+        List<PartialBotApiMethod<? extends Serializable>> list=new ArrayList<>();
+//        list.add(editText(user, text, messageId));
+        list.add(editReplyMarkup(user, markup, messageId));
+        return list;
+
+    }
+
+
+
+
+
+
+
 
 
     public SendMessage simple(TelegramUser user){
@@ -160,7 +224,7 @@ public class MessageTemplate {
                     boolean first=false;
                     if (util.totalPages(categories,6)<=page) last=true;
                     if (1>=page) first=true;
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last);
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last,"Kategoriyalar");
 //                    subList.forEach(c->col.add(c.getName(),"c-"+c.getId()+"-1"));
 //
 //                    Row row=new Row();
@@ -182,7 +246,7 @@ public class MessageTemplate {
                         boolean first=false;
                         if (util.totalPages(root.data.categories,6)<=page) last=true;
                         if (1>=page) first=true;
-                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6),first,last);
+                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6),first,last,"Kategoriyalar");
                     }
                     return null;
                 }
@@ -190,6 +254,7 @@ public class MessageTemplate {
             }
             else{
 
+                String name=rootModel.getParentName(id,rootModel);
                 List<Category> categories = rootModel.getChildren(id, rootModel);
 
                 if (categories==null){
@@ -203,7 +268,7 @@ public class MessageTemplate {
                     boolean first=false;
                     if (util.totalPages(categories,6)<=page) last=true;
                     if (1>=page) first=true;
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last);
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last,name);
                 }
 
                 return null;
@@ -217,7 +282,7 @@ public class MessageTemplate {
     }
 
 
-    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages,boolean first, boolean last){
+    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages,boolean first, boolean last, String parentName){
         try {
             if (page<=0||page>totalPages) return null;
             Col col=new Col();
@@ -247,7 +312,7 @@ public class MessageTemplate {
             return SendMessage
                     .builder()
                     .chatId(String.valueOf(user.getId()))
-                    .text("Kategoriyalar")
+                    .text(!Objects.equals(parentName, "") ?parentName:"Kategoriyalar")
                     .replyMarkup(col.getMarkup())
                     .build();
         }catch (Exception e){
@@ -277,20 +342,18 @@ public class MessageTemplate {
     }
 
 
-    public InlineKeyboardMarkup productSearchKeyboard(Integer product_id, TelegramUser user){
+    public InlineKeyboardMarkup productSearchKeyboard(ProductSmall product, TelegramUser user){
         Col col=new Col();
-        Row row=new Row();
-        row.add("➖","p-"+product_id+"-minus");
-        row.add("1","p-"+product_id);
-        row.add("➕","p-"+product_id+"-plus");
-        col.add(row);
-        row.clear();
-//                row.add("✅ Buyurtma berish","add_order");
-        row.add(AddBasket.get(user),"addBasket-"+product_id+"-1");
-        col.add(row);
-//                    col.add("\uD83D\uDD19 Orqaga","backTo");
-//        col.add(BackBtn.get(user),"c-"+user.getCurrent_category_id()+"-1");
-        col.add(MainMenuBtn.get(user),"EXIT");
+//        Row row=new Row();
+//        row.add("➖","p-"+product.id+"-minus");
+//        row.add("1","p-"+product.id);
+//        row.add("➕","p-"+product.id+"-plus");
+//        col.add(row);
+//        row.clear();
+//        row.add(AddBasket.get(user),"addBasket-"+product.id+"-1");
+//        col.add(row);
+        col.add(product.name,"p-"+product.id+"-1");
+//        col.add(MainMenuBtn.get(user),"EXIT");
         return col.getMarkup();
     }
 
@@ -434,6 +497,7 @@ public class MessageTemplate {
             return null;
         }
     }
+
 
 
 

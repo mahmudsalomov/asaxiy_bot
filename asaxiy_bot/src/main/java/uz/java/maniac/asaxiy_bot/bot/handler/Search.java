@@ -5,14 +5,18 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.MessageEntity;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultPhoto;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.json.ProductSmall;
@@ -36,14 +40,37 @@ public class Search implements Handler{
     private UnirestHelper helper;
     @Autowired
     private TelegramUserRepository telegramUserRepository;
+    @Autowired
+    private Product productHandler;
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
+        System.out.println("MESSAGE = "+message);
         return null;
     }
 
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, CallbackQuery callback) throws IOException {
         return null;
+    }
+
+
+    // Istisno metod
+    public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, Update update) throws IOException {
+
+        try {
+            List<List<InlineKeyboardButton>> keyboard = update.getMessage().getReplyMarkup().getKeyboard();
+            CallbackQuery callbackQuery=new CallbackQuery();
+            callbackQuery.setData(keyboard.get(0).get(0).getCallbackData());
+            callbackQuery.setMessage(update.getMessage());
+            System.out.println(keyboard.get(0).get(0).getCallbackData());
+            return productHandler.handle(user,callbackQuery);
+        }catch (Exception e){
+            user.setState(State.START);
+            telegramUserRepository.save(user);
+            return null;
+        }
+
+
     }
 
 
@@ -93,7 +120,7 @@ public class Search implements Handler{
 //            messageEntity.setLanguage(user.getLang().name());
 //            messageEntity.setText("AAAA");
 
-                user.setState(State.START);
+//                user.setState(State.START);
 
                 InputTextMessageContent messageContent= InputTextMessageContent
                         .builder()
@@ -107,7 +134,8 @@ public class Search implements Handler{
                         .title(product.getName())
                         .thumbUrl(product.getImage())
                         .id(String.valueOf(product.getId()))
-                        .replyMarkup(messageTemplate.productSearchKeyboard(product.id, user))
+                        .replyMarkup(messageTemplate.productSearchKeyboard(product, user))
+//                        .url(product.getImage())
 //                    .hideUrl(true)
                         .inputMessageContent(messageContent)
                         .build();
@@ -117,7 +145,8 @@ public class Search implements Handler{
         }
 
 
-
+        user.setState(State.SEARCH);
+        telegramUserRepository.save(user);
 
         answer.setInlineQueryId(inlineQuery.getId());
         answer.setResults(results);

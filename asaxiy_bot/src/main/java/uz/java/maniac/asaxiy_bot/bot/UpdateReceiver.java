@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import uz.java.maniac.asaxiy_bot.bot.handler.Handler;
 import uz.java.maniac.asaxiy_bot.bot.handler.OrderHandler;
 import uz.java.maniac.asaxiy_bot.bot.handler.Search;
+import uz.java.maniac.asaxiy_bot.bot.handler.Start;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
@@ -27,6 +28,7 @@ import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,10 +41,13 @@ public class UpdateReceiver {
     private final TelegramUserService telegramUserService;
     private final OrderRepository orderRepository;
     private final OrderService orderService;
+    private final MessageTemplate messageTemplate;
 
     @Autowired
     private OrderHandler orderHandler;
 
+    @Autowired
+    private Search search;
 
 
     private List<PartialBotApiMethod<? extends Serializable>> handleIncomingInlineQuery(TelegramUser user, InlineQuery inlineQuery) {
@@ -62,52 +67,46 @@ public class UpdateReceiver {
 
 
     @Autowired
-    public UpdateReceiver(List<Handler> handlers, TelegramUserRepository telegramUserRepository, TelegramUserService telegramUserService, OrderRepository orderRepository, OrderService orderService) {
+    public UpdateReceiver(List<Handler> handlers, TelegramUserRepository telegramUserRepository, TelegramUserService telegramUserService, OrderRepository orderRepository, OrderService orderService, MessageTemplate messageTemplate) {
         this.handlers = handlers;
         this.telegramUserRepository = telegramUserRepository;
         this.telegramUserService = telegramUserService;
         this.orderRepository = orderRepository;
         this.orderService = orderService;
+        this.messageTemplate = messageTemplate;
     }
 
     @Transactional
     public List<PartialBotApiMethod<? extends Serializable>> handle(Update update) {
         try {
+            List<PartialBotApiMethod<? extends Serializable>> results=new ArrayList<>();
 
             if (update.hasMessage()){
 
-                if (isMessageWithText(update)) {
-
-                    final Message message = update.getMessage();
-                    System.out.println(message);
+                final Message message = update.getMessage();
+                System.out.println(message);
 //                update.getMessage().getFrom();
 
 
-                    final Long chatId = message.getFrom().getId();
-                    final TelegramUser user = telegramUserRepository.findById(chatId)
-                            .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getMessage().getFrom())));
+                final Long chatId = message.getFrom().getId();
+                final TelegramUser user = telegramUserRepository.findById(chatId)
+                        .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getMessage().getFrom())));
+                if (isMessageWithText(update)) {
+
+
 
                     telegramUserRepository.save(user);
                     System.out.println(handlers);
                     System.out.println(handlers.size());
                     handlers.forEach(System.out::println);
                     handlers.forEach(h-> System.out.println(h.operatedCallBackQuery(user)));
-//                System.out.println(user);
+
+                    if (user.getState().equals(State.SEARCH)) return search.handle(user,update);
+
                     Optional<TelegramUser> byId = telegramUserRepository.findById(user.getId());
-//                System.out.println(byId.get());
                     return getHandlerByState(user.getState()).handle(user, message.getText());
                 }
 
-
-
-
-
-
-
-                final Message message = update.getMessage();
-                final Long chatId = message.getFrom().getId();
-                final TelegramUser user = telegramUserRepository.findById(chatId)
-                        .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getMessage().getFrom())));
                 if (update.getMessage().hasContact()){
                     List<Order> orders = orderRepository.findAllByUserAndOrderStateEquals(user, OrderState.DRAFT);
                     if (orders.size()>0&&orders.get(0).getOrder_phone()==null)
@@ -122,56 +121,40 @@ public class UpdateReceiver {
             }
 
             if (update.hasInlineQuery()){
+
+
                 System.out.println(update.getInlineQuery());
                 System.out.println("Query = "+update.getInlineQuery().getQuery());
                 final Long chatId = update.getInlineQuery().getFrom().getId();
 
                 final TelegramUser user = telegramUserRepository.findById(chatId)
                         .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getInlineQuery().getFrom())));
+
+                if (user.getState().equals(State.ORDER)) results.add(messageTemplate.removeProcess(user));
                 Search search= (Search) getHandlerByState(State.SEARCH);
-                return search.handle(user,update.getInlineQuery());
+                results.addAll(search.handle(user,update.getInlineQuery()));
+                return results;
             }
 
-
-
             else if (update.hasCallbackQuery()) {
-
                 System.out.println(update.getCallbackQuery().getData());
                 final CallbackQuery callbackQuery = update.getCallbackQuery();
                 final Long chatId = callbackQuery.getFrom().getId();
                 String message=callbackQuery.getData();
                 System.out.println(update.getCallbackQuery().getData());
+                final TelegramUser user = telegramUserRepository.findById(chatId)
+                        .orElseGet(() -> telegramUserRepository.save(new TelegramUser(callbackQuery.getFrom())));
+                if (user.getState().equals(State.ORDER)) results.add(messageTemplate.removeProcess(user));
                 if (callbackQuery.getData().equals("EXIT")){
-                    final TelegramUser user = telegramUserRepository.findById(chatId)
-                            .orElseGet(() -> telegramUserRepository.save(new TelegramUser(callbackQuery.getFrom())));
                     user.setState(State.START);
-//                    user.setAction(" ");
                     telegramUserRepository.save(user);
-                    return getHandlerByState(user.getState()).handle(user, callbackQuery.getData());
+
+                    results.addAll(getHandlerByState(user.getState()).handle(user, callbackQuery.getData()));
+                    return results;
                 }
-
-
-                    final TelegramUser user = telegramUserRepository.findById(chatId)
-                            .orElseGet(() -> telegramUserRepository.save(new TelegramUser(callbackQuery.getFrom())));
-//                user.setAction(addAction(user, message).trim());
-//                System.out.println(user.getAction());
-//                User save = userRepository.save(user);
-                return getHandlerByCallBackQuery(TelegramUtil.parseString(callbackQuery.getData(),0),user).handle(user, callbackQuery);
-//
-//                }
-
-
-
-
+                results.addAll(getHandlerByCallBackQuery(TelegramUtil.parseString(callbackQuery.getData(),0),user).handle(user, callbackQuery));
+                return results;
             }
-//            else if (update.getMessage().hasContact()){
-//                Start startHandler=new Start(telegramUserService);
-//                final Long chatId =update.getMessage().getChatId();
-//                final TelegramUser user = telegramUserRepository.findById(chatId)
-//                        .orElseGet(() -> telegramUserRepository.save(new TelegramUser(chatId)));
-//
-//                return startHandler.addContact(user,update);
-//            }
 
             throw new UnsupportedOperationException();
         } catch (UnsupportedOperationException | IOException e) {
@@ -189,9 +172,6 @@ public class UpdateReceiver {
     }
 
     private Handler getHandlerByCallBackQuery(String query,TelegramUser user) {
-//        System.out.println("state Callback "+query);
-//        System.out.println(handlers);
-//        handlers.forEach(item-> System.out.println(item.operatedCallBackQuery()));
         String[] parts=query.split("-");
         String finalQuery = parts[0];
         return handlers.stream()
@@ -204,27 +184,4 @@ public class UpdateReceiver {
     private boolean isMessageWithText(Update update) {
         return !update.hasCallbackQuery() && update.hasMessage() && update.getMessage().hasText()&& !update.getMessage().hasContact();
     }
-
-//    private String addAction(User user,String data){
-//        String[] split = data.split("-");
-//        if (user.getAction().equals("")){
-//           switch (split[0]){
-//               case "PRODUCT": return "-c-1";
-//               case "catId": return "-c-"+split[1];
-//               case "brandId": return "-b-"+split[1];
-//               case "prodId": return "-p-"+split[1];
-//               default:return " ";
-//           }
-//       }else  {
-//            switch (split[0]){
-//                case "PRODUCT": return user.getAction()+"-c-1";
-//                case "catId": return user.getAction()+"-c-"+split[1];
-//                case "brandId": return user.getAction()+"-b-"+split[1];
-//                case "prodId": return user.getAction()+"-p-"+split[1];
-//                default:return user.getAction()+" ";
-//            }
-//       }
-//    }
-
-
 }

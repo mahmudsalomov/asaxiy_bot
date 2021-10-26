@@ -132,6 +132,8 @@ public class Bot extends TelegramLongPollingBot {
                     executeWithExceptionCheck((AnswerCallbackQuery) response);
                 } else if (response instanceof AnswerInlineQuery){
                     executeWithExceptionCheck((AnswerInlineQuery) response);
+                } else if (response instanceof EditMessageText){
+                    executeWithExceptionCheck((EditMessageText) response);
                 }
 
             });
@@ -154,6 +156,15 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void executeWithExceptionCheck(EditMessageReplyMarkup sendMessage) {
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            log.error("oops");
+        }
+    }
+
+    public void executeWithExceptionCheck(EditMessageText sendMessage) {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {

@@ -38,4 +38,27 @@ public class RootModel {
         }
         return null;
     }
+
+
+    public String getParentName(int id, RootModel root){
+        return nameFinder(id, root.categories);
+    }
+
+    public String nameFinder(int id, List<Category> categories){
+        for (Category category : categories) {
+            if (category.id == id) return category.name;
+        }
+        return "";
+    }
+
+    public String getImage(int id, RootModel root){
+        return imageFinder(id, root.categories);
+    }
+
+    public String imageFinder(int id, List<Category> categories){
+        for (Category category : categories) {
+            if (category.id == id) return category.image;
+        }
+        return "";
+    }
 }

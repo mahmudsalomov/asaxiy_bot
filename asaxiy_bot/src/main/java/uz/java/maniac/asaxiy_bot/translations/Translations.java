@@ -29,6 +29,7 @@ public enum Translations {
     DeleteBtn("❌ Ўчириш!","❌ O'chirish!","❌ Удалить!"),
     OrderBtn("✅Буюртма бериш!","✅Buyurtma berish!","✅Заказать!"),
     EmptyBasket("*❗ Саватча бўш!*","*❗ Savatcha bo'sh!*","*❗ Корзина пуста!*"),
+    EmptyOrders("*Буюртмалар йўқ!*","*Buyurtmalar yo'q!*","*Нет заказов!*"),
 
     NeedPhoneMsg("*❗ Буюртмани тасдиқлаш учун телефон рақамингизни юборинг!*","*❗ Buyurtmani tasdiqlash uchun telefon raqamingizni yuboring!*","*❗ Отправьте свой номер телефона для подтверждения заказа!*"),
     NeedLocationMsg("*❗ Буюртмани тасдиқлаш учун манзилингизни юборинг!*",
@@ -37,6 +38,7 @@ public enum Translations {
     SendPhoneBtn("\uD83D\uDCDEТелефон рақамни юбориш","\uD83D\uDCDETelefon raqamni yuborish","\uD83D\uDCDEОтправить номер телефона"),
     SendLocationBtn("\uD83D\uDCCDМанзил юбориш","\uD83D\uDCCDManzil yuborish","\uD83D\uDCCDОтправить адрес"),
     CancelBtn("❌Бекор қилиш","❌Bekor qilish","❌Отмена"),
+    StopProcessMsg("\uD83D\uDED1Жараён тўхтатилди!","\uD83D\uDED1Jarayon to'xtatildi!","\uD83D\uDED1Процесс остановлен!"),
 
     MyOrdersBtn("\uD83D\uDD16Буюртмаларим","\uD83D\uDD16Buyurtmalarim","\uD83D\uDD16Мои заказы"),
     MyLanguageBtn("\uD83C\uDF0EТил","\uD83C\uDF0ETil","\uD83C\uDF0EЯзык"),

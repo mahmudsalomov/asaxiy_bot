@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
+import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
 import uz.java.maniac.asaxiy_bot.model.order.Order;
 import uz.java.maniac.asaxiy_bot.model.order.OrderState;
 import uz.java.maniac.asaxiy_bot.repository.OrderRepository;
@@ -21,6 +22,7 @@ import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
 import uz.java.maniac.asaxiy_bot.service.OrderService;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 import uz.java.maniac.asaxiy_bot.translations.Translations;
+import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
 import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.io.IOException;
@@ -34,6 +36,8 @@ import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate
 @Component
 public class OrderHandler implements Handler{
 
+    @Autowired
+    private MessageTemplate messageTemplate;
     @Autowired
     private Start start;
     @Autowired
@@ -51,18 +55,16 @@ public class OrderHandler implements Handler{
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
         System.out.println(message);
-        SendMessage messageTemplate = createMessageTemplate(user);
+        SendMessage sendMessage = createMessageTemplate(user);
 
         if (message.equals(Translations.CancelBtn.get(user))){
             orderService.removePhone(user);
             user.setState(State.START);
             userRepository.save(user);
-            ReplyKeyboardRemove replyKeyboardRemove=new ReplyKeyboardRemove();
-            replyKeyboardRemove.setRemoveKeyboard(true);
-            messageTemplate.setReplyMarkup(replyKeyboardRemove);
-            messageTemplate.setText("Bekor qilindi!");
-
-            return Collections.singletonList(messageTemplate);
+            List<PartialBotApiMethod<? extends Serializable>> list=new ArrayList<>();
+            list.add(messageTemplate.removeProcess(user));
+            list.add(messageTemplate.mainMenu(user));
+            return list;
         }
 
 
@@ -81,11 +83,11 @@ public class OrderHandler implements Handler{
         list.add(row);
         list.add(row2);
 
-        messageTemplate.setText(Translations.NeedLocationMsg.get(user));
+        sendMessage.setText(Translations.NeedLocationMsg.get(user));
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(list);
         keyboardMarkup.setResizeKeyboard(true);
-        messageTemplate.setReplyMarkup(keyboardMarkup);
-        return Collections.singletonList(messageTemplate);
+        sendMessage.setReplyMarkup(keyboardMarkup);
+        return Collections.singletonList(sendMessage);
     }
 
     @Override

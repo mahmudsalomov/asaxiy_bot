@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.json.product.Product;
+import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
 import uz.java.maniac.asaxiy_bot.model.order.Order;
 import uz.java.maniac.asaxiy_bot.model.order.OrderState;
 import uz.java.maniac.asaxiy_bot.model.order.ProductOrder;
@@ -32,6 +35,9 @@ import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate
 
 @Component
 public class Basket implements Handler{
+
+    @Autowired
+    private MessageTemplate messageTemplate;
     @Autowired
     private UnirestHelper helper;
     @Autowired
@@ -47,6 +53,9 @@ public class Basket implements Handler{
 
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, CallbackQuery callback) throws IOException {
+
+
+        List<PartialBotApiMethod<? extends Serializable>> results=new ArrayList<>();
 
 
         List<Order> orders = orderRepository.findAllByUserAndOrderStateEquals(user,OrderState.DRAFT);
@@ -162,11 +171,17 @@ public class Basket implements Handler{
         sendMessage.setReplyMarkup(col.getMarkup());
 
 
-
+//        EditMessageReplyMarkup editMessageReplyMarkup=new EditMessageReplyMarkup();
+//        editMessageReplyMarkup.setChatId(String.valueOf(user.getId()));
+//        editMessageReplyMarkup.setMessageId(callback.getMessage().getMessageId());
+//        editMessageReplyMarkup.setReplyMarkup((InlineKeyboardMarkup) sendMessage.getReplyMarkup());
+//
+//
+//        messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId());
 
 
         System.out.println("SAVATCHA");
-        return Collections.singletonList(sendMessage);
+        return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
     }
 
     @Override
