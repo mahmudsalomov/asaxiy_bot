@@ -21,8 +21,11 @@ import uz.java.maniac.asaxiy_bot.model.json.Category;
 import uz.java.maniac.asaxiy_bot.model.json.ProductSmall;
 import uz.java.maniac.asaxiy_bot.model.json.Root;
 import uz.java.maniac.asaxiy_bot.model.json.product.Product;
+import uz.java.maniac.asaxiy_bot.model.order.OrderState;
 import uz.java.maniac.asaxiy_bot.model.temp.RootModel;
 import uz.java.maniac.asaxiy_bot.model.temp.TempRoot;
+import uz.java.maniac.asaxiy_bot.repository.OrderRepository;
+import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 import uz.java.maniac.asaxiy_bot.translations.Translations;
 import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
@@ -46,6 +49,8 @@ public class MessageTemplate {
     private TempRoot tempRoot;
     @Autowired
     UnirestHelper helper;
+    @Autowired
+    private TelegramUserRepository userRepository;
 
 
     public SendMessage removeProcess(TelegramUser user){
@@ -55,6 +60,8 @@ public class MessageTemplate {
         sendMessage.setReplyMarkup(replyKeyboardRemove);
         sendMessage.setAllowSendingWithoutReply(true);
         sendMessage.setText(StopProcessMsg.get(user));
+        user.setState(State.START);
+        userRepository.save(user);
         return sendMessage;
     }
 

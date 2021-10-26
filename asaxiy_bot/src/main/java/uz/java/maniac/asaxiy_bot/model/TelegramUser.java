@@ -29,6 +29,9 @@ public class TelegramUser {
     @Enumerated(EnumType.STRING)
     private State state;
 
+    @Column(columnDefinition = "text")
+    private String location;
+
 
 
     @Column(name = "current_category_id", nullable = false)

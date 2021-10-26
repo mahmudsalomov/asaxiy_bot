@@ -115,7 +115,7 @@ public class UpdateReceiver {
 
                 if (update.getMessage().hasLocation()){
                     List<Order> orders = orderRepository.findAllByUserAndOrderStateEquals(user, OrderState.DRAFT);
-                    if (orders.size()>0&&orders.get(0).getOrder_phone()==null)
+                    if (orders.size()>0&&(orders.get(0).getOrder_phone()==null||orders.get(0).getOrder_location()==null))
                         return orderHandler.handle(user,update.getMessage().getLocation().toString());
                 }
             }

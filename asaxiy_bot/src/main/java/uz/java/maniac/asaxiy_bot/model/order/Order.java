@@ -29,6 +29,8 @@ public class Order {
     private TelegramUser user;
 
     private String order_phone;
+    @Column(columnDefinition = "text")
+    private String order_location;
 
     @Enumerated(EnumType.STRING)
     private OrderState orderState;

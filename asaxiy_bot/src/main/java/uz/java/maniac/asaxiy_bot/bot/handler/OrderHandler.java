@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static uz.java.maniac.asaxiy_bot.translations.Translations.MainMenuBtn;
 import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
 
 @Component
@@ -66,28 +67,75 @@ public class OrderHandler implements Handler{
             list.add(messageTemplate.mainMenu(user));
             return list;
         }
+        List<Order> orders = orderRepository.findAllByUserAndOrderStateEquals(user, OrderState.DRAFT);
+
+        if (orders.size()==0){
+            orderService.removePhone(user);
+            user.setState(State.START);
+            userRepository.save(user);
+            List<PartialBotApiMethod<? extends Serializable>> list=new ArrayList<>();
+            list.add(messageTemplate.removeProcess(user));
+            list.add(messageTemplate.mainMenu(user));
+            return list;
+        }
 
 
-        KeyboardButton button=new KeyboardButton();
-        button.setRequestLocation(true);
-        button.setText(Translations.SendLocationBtn.get(user));
-        KeyboardRow row=new KeyboardRow();
-        row.add(button);
 
-        KeyboardButton button2=new KeyboardButton();
-        button2.setText(Translations.CancelBtn.get(user));
-        KeyboardRow row2=new KeyboardRow();
-        row2.add(button2);
 
-        List<KeyboardRow> list=new ArrayList<>();
-        list.add(row);
-        list.add(row2);
+        if (orders.get(0).getOrder_phone()!=null){
 
-        sendMessage.setText(Translations.NeedLocationMsg.get(user));
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(list);
-        keyboardMarkup.setResizeKeyboard(true);
-        sendMessage.setReplyMarkup(keyboardMarkup);
-        return Collections.singletonList(sendMessage);
+            if (orders.get(0).getOrder_location()!=null){
+                user.setState(State.START);
+                userRepository.save(user);
+                orders.get(0).setOrderState(OrderState.ACTIVE);
+                orderRepository.save(orders.get(0));
+                Col col=new Col();
+                sendMessage.setText(Translations.ConfrimOrderMsg.get(user));
+                col.add(MainMenuBtn.get(user.getLang()),"EXIT");
+                sendMessage.setReplyMarkup(col.getMarkup());
+                return Collections.singletonList(sendMessage);
+            }
+
+            orders.get(0).setOrder_location(message);
+            orderRepository.save(orders.get(0));
+//            user.setState(State.START);
+//            userRepository.save(user);
+            List<PartialBotApiMethod<? extends Serializable>> list=new ArrayList<>();
+            list.add(messageTemplate.removeProcess(user));
+            list.add(messageTemplate.mainMenu(user));
+            return list;
+
+        } else {
+            orders.get(0).setOrder_phone(message);
+            orderRepository.save(orders.get(0));
+//            orderService.removePhone(user);
+
+
+
+            KeyboardButton button=new KeyboardButton();
+            button.setRequestLocation(true);
+            button.setText(Translations.SendLocationBtn.get(user));
+            KeyboardRow row=new KeyboardRow();
+            row.add(button);
+
+            KeyboardButton button2=new KeyboardButton();
+            button2.setText(Translations.CancelBtn.get(user));
+            KeyboardRow row2=new KeyboardRow();
+            row2.add(button2);
+
+            List<KeyboardRow> list=new ArrayList<>();
+            list.add(row);
+            list.add(row2);
+
+            sendMessage.setText(Translations.NeedLocationMsg.get(user));
+            ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup(list);
+            keyboardMarkup.setResizeKeyboard(true);
+            sendMessage.setReplyMarkup(keyboardMarkup);
+//            orderService.removePhone(user);
+            return Collections.singletonList(sendMessage);
+        }
+
+
     }
 
     @Override

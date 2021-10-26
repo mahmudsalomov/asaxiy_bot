@@ -48,6 +48,7 @@ public class Basket implements Handler{
     private ProductWithAmountRepository productWithAmountRepository;
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
+
         return null;
     }
 
@@ -138,10 +139,11 @@ public class Basket implements Handler{
 
             Col col=new Col();
             col.add(Translations.MainMenuBtn.get(user),"EXIT");
-            SendMessage messageTemplate = createMessageTemplate(user);
-            messageTemplate.setText(Translations.EmptyBasket.get(user));
-            messageTemplate.setReplyMarkup(col.getMarkup());
-            return Collections.singletonList(messageTemplate);
+            SendMessage messageT = createMessageTemplate(user);
+            messageT.setText(Translations.EmptyBasket.get(user));
+            messageT.setReplyMarkup(col.getMarkup());
+            List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), messageT.getText(), col.getMarkup());
+            return list;
         }
 
 
@@ -181,9 +183,13 @@ public class Basket implements Handler{
 
 
         System.out.println("SAVATCHA");
-        List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), col.getMarkup());
+        if (parseString[0].equals("amount")){
+            List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), col.getMarkup());
+            return list;
+        }
+//        List<PartialBotApiMethod<? extends Serializable>> list = messageTemplate.editTextAndReplyMarkup(user, callback.getMessage().getMessageId(), sendMessage.getText(), col.getMarkup());
 //        return Collections.singletonList(messageTemplate.editReplyMarkup(user, (InlineKeyboardMarkup) sendMessage.getReplyMarkup(),callback.getMessage().getMessageId()));
-        return list;
+        return Collections.singletonList(sendMessage);
     }
 
     @Override
