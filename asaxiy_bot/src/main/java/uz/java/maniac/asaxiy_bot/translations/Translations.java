@@ -47,6 +47,7 @@ public enum Translations {
     MyLanguageBtn("\uD83C\uDF0EТил","\uD83C\uDF0ETil","\uD83C\uDF0EЯзык"),
     Product("Маҳсулот : ","Mahsulot : ","Продукт : "),
     Categories("Категориялар","Kategoriyalar","Категории"),
+    More("Batafsil","Batafsil","Более"),
 
     AddBasket("\uD83D\uDED2 Саватга жойлаш","\uD83D\uDED2 Savatga joylash","\uD83D\uDED2 Покупка");
 

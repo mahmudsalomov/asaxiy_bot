@@ -378,21 +378,21 @@ public class MessageTemplate {
 //                URL url=new URL(product.getMain_image());
 //                URLConnection connection=url.openConnection();
                 try {
-                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
+//                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
 //                    String src="<a href='https://www.youtube.com/watch?v=u_6eufrgceI'>aa</a>";
                     SendMessage photoTemplate = new SendMessage();
                     photoTemplate.setChatId(String.valueOf(user.getId()));
 //                    InputFile file=new InputFile();
 //                    file.setMedia(connection.getInputStream(),"Photo");
 //                    photoTemplate.setPhoto(file);
-                    photoTemplate.setParseMode(ParseMode.HTML);
+                    photoTemplate.setParseMode(ParseMode.MARKDOWN);
 //                    photoTemplate.setCaption(product.getName()+"\n"+Price.get(user)+product.getActual_price()+" \n");
 //                    photoTemplate.setCaption(nameMessage(product.description));
-                    photoTemplate.setDisableWebPagePreview(true);
+                    photoTemplate.setDisableWebPagePreview(false);
 
                     photoTemplate.setText(product.getName()+"\n\n"+Price.get(user)+product.getActual_price()+" \n\n"+
                             "http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang());
-                    photoTemplate.setText("a\n"+src);
+//                    photoTemplate.setText("a\n"+src);
 
                     photoTemplate.setReplyMarkup(productKeyboard(id,user));
 
@@ -467,7 +467,7 @@ public class MessageTemplate {
                 URL url=new URL(product.getMain_image());
                 URLConnection connection=url.openConnection();
                 try {
-                    String src="<a href='http://localhost:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
+                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>"+ More.get(user)+"</a>";
                     SendPhoto photoTemplate = new SendPhoto();
                     photoTemplate.setChatId(String.valueOf(user.getId()));
                     InputFile file=new InputFile();
