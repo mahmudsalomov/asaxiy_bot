@@ -2,6 +2,7 @@ package uz.java.maniac.asaxiy_bot.model;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -31,6 +32,8 @@ public class TelegramUser {
 
     @Column(columnDefinition = "text")
     private String location;
+
+    private String lastCallback;
 
 
 

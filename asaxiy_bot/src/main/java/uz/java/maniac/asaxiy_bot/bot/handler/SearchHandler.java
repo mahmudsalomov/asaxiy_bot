@@ -3,19 +3,13 @@ package uz.java.maniac.asaxiy_bot.bot.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.MessageEntity;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
-import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultPhoto;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
@@ -24,7 +18,6 @@ import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
 import uz.java.maniac.asaxiy_bot.repository.TelegramUserRepository;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 import uz.java.maniac.asaxiy_bot.translations.Translations;
-import uz.java.maniac.asaxiy_bot.utils.ButtonModel.Col;
 import uz.java.maniac.asaxiy_bot.utils.TelegramUtil;
 
 import java.io.IOException;
@@ -35,13 +28,13 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class Search implements Handler{
+public class SearchHandler implements Handler{
     @Autowired
     private UnirestHelper helper;
     @Autowired
     private TelegramUserRepository telegramUserRepository;
     @Autowired
-    private Product productHandler;
+    private ProductHandler productHandler;
     @Override
     public List<PartialBotApiMethod<? extends Serializable>> handle(TelegramUser user, String message) throws IOException {
         System.out.println("MESSAGE = "+message);

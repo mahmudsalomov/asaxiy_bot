@@ -34,7 +34,7 @@ import java.util.List;
 import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
 
 @Component
-public class Basket implements Handler{
+public class BasketHandler implements Handler{
 
     @Autowired
     private MessageTemplate messageTemplate;
@@ -156,7 +156,7 @@ public class Basket implements Handler{
         for (ProductWithAmount amount:amounts){
             if (amount.getProductOrder().actual_price!=0){
                 row.clear();
-                text+="Mahsulot:\n*"+amount.getProductOrder().name+"\n"
+                text+=Translations.Product.get(user)+"\n*"+amount.getProductOrder().name+"\n"
                         +amount.getAmount()+"x"+amount.getProductOrder().actual_price+"="
                         +(amount.getAmount()*amount.getProductOrder().actual_price)+"*\n\n";
                 row.add(Translations.DeleteBtn.get(user),"amount-"+amount.getId());

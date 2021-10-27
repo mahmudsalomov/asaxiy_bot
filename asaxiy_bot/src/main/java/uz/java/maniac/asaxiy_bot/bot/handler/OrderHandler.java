@@ -6,8 +6,6 @@ import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import uz.java.maniac.asaxiy_bot.model.State;
@@ -40,7 +38,7 @@ public class OrderHandler implements Handler{
     @Autowired
     private MessageTemplate messageTemplate;
     @Autowired
-    private Start start;
+    private StartHandler startHandler;
     @Autowired
     private UnirestHelper helper;
     @Autowired
@@ -90,7 +88,7 @@ public class OrderHandler implements Handler{
                 orders.get(0).setOrderState(OrderState.ACTIVE);
                 orderRepository.save(orders.get(0));
                 Col col=new Col();
-                sendMessage.setText(Translations.ConfrimOrderMsg.get(user));
+                sendMessage.setText(Translations.ConfirmOrderMsg.get(user));
                 col.add(MainMenuBtn.get(user.getLang()),"EXIT");
                 sendMessage.setReplyMarkup(col.getMarkup());
                 return Collections.singletonList(sendMessage);

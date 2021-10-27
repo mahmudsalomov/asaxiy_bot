@@ -13,8 +13,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
 import uz.java.maniac.asaxiy_bot.bot.handler.Handler;
 import uz.java.maniac.asaxiy_bot.bot.handler.OrderHandler;
-import uz.java.maniac.asaxiy_bot.bot.handler.Search;
-import uz.java.maniac.asaxiy_bot.bot.handler.Start;
+import uz.java.maniac.asaxiy_bot.bot.handler.SearchHandler;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
 import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
@@ -47,7 +46,7 @@ public class UpdateReceiver {
     private OrderHandler orderHandler;
 
     @Autowired
-    private Search search;
+    private SearchHandler searchHandler;
 
 
     private List<PartialBotApiMethod<? extends Serializable>> handleIncomingInlineQuery(TelegramUser user, InlineQuery inlineQuery) {
@@ -101,7 +100,7 @@ public class UpdateReceiver {
                     handlers.forEach(System.out::println);
                     handlers.forEach(h-> System.out.println(h.operatedCallBackQuery(user)));
 
-                    if (user.getState().equals(State.SEARCH)) return search.handle(user,update);
+                    if (user.getState().equals(State.SEARCH)) return searchHandler.handle(user,update);
 
                     Optional<TelegramUser> byId = telegramUserRepository.findById(user.getId());
                     return getHandlerByState(user.getState()).handle(user, message.getText());
@@ -131,12 +130,13 @@ public class UpdateReceiver {
                         .orElseGet(() -> telegramUserRepository.save(new TelegramUser(update.getInlineQuery().getFrom())));
 
                 if (user.getState().equals(State.ORDER)) results.add(messageTemplate.removeProcess(user));
-                Search search= (Search) getHandlerByState(State.SEARCH);
-                results.addAll(search.handle(user,update.getInlineQuery()));
+                SearchHandler searchHandler = (SearchHandler) getHandlerByState(State.SEARCH);
+                results.addAll(searchHandler.handle(user,update.getInlineQuery()));
                 return results;
             }
 
             else if (update.hasCallbackQuery()) {
+
                 System.out.println(update.getCallbackQuery().getData());
                 final CallbackQuery callbackQuery = update.getCallbackQuery();
                 final Long chatId = callbackQuery.getFrom().getId();

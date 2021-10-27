@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.java.maniac.asaxiy_bot.model.Lang;
 import uz.java.maniac.asaxiy_bot.model.json.product.Product;
+import uz.java.maniac.asaxiy_bot.model.message.MessageTemplate;
 import uz.java.maniac.asaxiy_bot.model.temp.TempRoot;
 import uz.java.maniac.asaxiy_bot.service.UnirestHelper;
 
@@ -21,10 +22,18 @@ public class Controller {
     private UnirestHelper helper;
     @Autowired
     private TempRoot root;
+    @Autowired
+    private MessageTemplate messageTemplate;
 
     @GetMapping("test")
     public HttpEntity<?> test(){
         return ResponseEntity.ok(root.rootOZ.categories);
+    }
+
+
+    @GetMapping("test/{id}")
+    public HttpEntity<?> test(@PathVariable Integer id){
+        return ResponseEntity.ok(messageTemplate.findParent(id));
     }
 
 

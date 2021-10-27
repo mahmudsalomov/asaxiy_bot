@@ -35,7 +35,7 @@ public enum Translations {
     NeedLocationMsg("*❗ Буюртмани тасдиқлаш учун манзилингизни ёзинг ёки геолокация юборинг!*",
             "*❗ Buyurtmani tasdiqlash uchun manzilingizni yozing yoki geolokatsiya yuboring!*",
             "*❗ Введите свой адрес или отправьте геолокацию для подтверждения заказа!*"),
-    ConfrimOrderMsg("*Буюртмангиз учун раҳмат, лекин ҳозирча ботда буюртма бериш ишламайди\uD83D\uDE1C*",
+    ConfirmOrderMsg("*Буюртмангиз учун раҳмат, лекин ҳозирча ботда буюртма бериш ишламайди\uD83D\uDE1C*",
             "*Buyurtmangiz uchun rahmat, lekin hozircha botda buyurtma berish ishlamaydi\uD83D\uDE1C*",
             "*Спасибо за заказ, но пока заказ на боте не работает\uD83D\uDE1C*"),
     SendPhoneBtn("\uD83D\uDCDEТелефон рақамни юбориш","\uD83D\uDCDETelefon raqamni yuborish","\uD83D\uDCDEОтправить номер телефона"),
@@ -45,6 +45,8 @@ public enum Translations {
 
     MyOrdersBtn("\uD83D\uDD16Буюртмаларим","\uD83D\uDD16Buyurtmalarim","\uD83D\uDD16Мои заказы"),
     MyLanguageBtn("\uD83C\uDF0EТил","\uD83C\uDF0ETil","\uD83C\uDF0EЯзык"),
+    Product("Маҳсулот : ","Mahsulot : ","Продукт : "),
+    Categories("Категориялар","Kategoriyalar","Категории"),
 
     AddBasket("\uD83D\uDED2 Саватга жойлаш","\uD83D\uDED2 Savatga joylash","\uD83D\uDED2 Покупка");
 

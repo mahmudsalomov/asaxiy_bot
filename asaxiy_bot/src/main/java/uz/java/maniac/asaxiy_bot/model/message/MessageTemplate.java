@@ -206,7 +206,7 @@ public class MessageTemplate {
 
     }
 
-    public SendMessage category(TelegramUser user,int id, int page){
+    public SendMessage category(TelegramUser user,int id, int page,String back_callback){
         TestInterface<Category> util=new TestInterface<>();
 
         if (id<=0) return mainMenu(user);
@@ -232,7 +232,7 @@ public class MessageTemplate {
                     boolean first=false;
                     if (util.totalPages(categories,6)<=page) last=true;
                     if (1>=page) first=true;
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last,"Kategoriyalar");
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last, Categories.get(user),back_callback);
 //                    subList.forEach(c->col.add(c.getName(),"c-"+c.getId()+"-1"));
 //
 //                    Row row=new Row();
@@ -254,7 +254,7 @@ public class MessageTemplate {
                         boolean first=false;
                         if (util.totalPages(root.data.categories,6)<=page) last=true;
                         if (1>=page) first=true;
-                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6),first,last,"Kategoriyalar");
+                        return categoryMessageBuilder(user,subList,id,page, util.totalPages(root.data.categories,6),first,last,Categories.get(user),back_callback);
                     }
                     return null;
                 }
@@ -267,7 +267,7 @@ public class MessageTemplate {
 
                 if (categories==null){
                     List<ProductSmall> productSmallList = helper.getProductByCategory(user.getLang(), id);
-                    return productByCategory(user,id,page);
+                    return productByCategory(user,id,page,back_callback);
                 }
 
                 if (categories.size()>0){
@@ -276,7 +276,7 @@ public class MessageTemplate {
                     boolean first=false;
                     if (util.totalPages(categories,6)<=page) last=true;
                     if (1>=page) first=true;
-                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last,name);
+                    return categoryMessageBuilder(user,subList,id,page,util.totalPages(categories,6),first,last,name,back_callback);
                 }
 
                 return null;
@@ -290,7 +290,7 @@ public class MessageTemplate {
     }
 
 
-    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages,boolean first, boolean last, String parentName){
+    protected SendMessage categoryMessageBuilder(TelegramUser user,List<Category> categories, int id, int page, int totalPages,boolean first, boolean last, String parentName, String back_callback){
         try {
             if (page<=0||page>totalPages) return null;
             Col col=new Col();
@@ -315,12 +315,12 @@ public class MessageTemplate {
             else row.add("⏹");
             col.add(row);
 
-            col.add(BackBtn.get(user.getLang()),"c-"+id+"-1");
+            col.add(BackBtn.get(user.getLang()),back_callback);
             col.add(MainMenuBtn.get(user.getLang()),"EXIT");
             return SendMessage
                     .builder()
                     .chatId(String.valueOf(user.getId()))
-                    .text(!Objects.equals(parentName, "") ?parentName:"Kategoriyalar")
+                    .text(!Objects.equals(parentName, "") ?parentName: Categories.get(user))
                     .replyMarkup(col.getMarkup())
                     .build();
         }catch (Exception e){
@@ -467,7 +467,7 @@ public class MessageTemplate {
                 URL url=new URL(product.getMain_image());
                 URLConnection connection=url.openConnection();
                 try {
-                    String src="<a href='http://185.170.214.207:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
+                    String src="<a href='http://localhost:8081/view/"+product.id+"/"+user.getLang()+"'>Batafsil</a>";
                     SendPhoto photoTemplate = new SendPhoto();
                     photoTemplate.setChatId(String.valueOf(user.getId()));
                     InputFile file=new InputFile();
@@ -507,7 +507,7 @@ public class MessageTemplate {
 //    }
 
 
-    public SendMessage productByCategory(TelegramUser user,int category_id, int page){
+    public SendMessage productByCategory(TelegramUser user,int category_id, int page,String back_callback){
         try {
             TestInterface<ProductSmall> util=new TestInterface<>();
             List<ProductSmall> productSmallList = helper.getProductByCategory(user.getLang(), category_id);
@@ -516,7 +516,7 @@ public class MessageTemplate {
             boolean first=false;
             if (util.totalPages(productSmallList,6)<=page) last=true;
             if (1>=page) first=true;
-            return productMessageBuilder(user,subList,page,util.totalPages(productSmallList,6),category_id,first,last);
+            return productMessageBuilder(user,subList,page,util.totalPages(productSmallList,6),category_id,first,last,back_callback);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -526,7 +526,7 @@ public class MessageTemplate {
 
 
 
-    protected SendMessage productMessageBuilder(TelegramUser user, List<ProductSmall> products, int page, int totalPages, int category_id,boolean first, boolean last){
+    protected SendMessage productMessageBuilder(TelegramUser user, List<ProductSmall> products, int page, int totalPages, int category_id,boolean first, boolean last,String back_callback){
         try {
             if (page<=0||page>totalPages) return null;
             Col col=new Col();
@@ -550,7 +550,8 @@ public class MessageTemplate {
             else row.add("⏹");
             col.add(row);
 
-            col.add(BackBtn.get(user.getLang()),"c-"+category_id+"-1");
+//            col.add(BackBtn.get(user.getLang()),"c-"+category_id+"-1");
+            col.add(BackBtn.get(user.getLang()),back_callback);
             col.add(MainMenuBtn.get(user.getLang()),"EXIT");
             return SendMessage
                     .builder()
@@ -578,6 +579,33 @@ public class MessageTemplate {
         }
     }
 
+    public int findParent(List<Category> categories,int id){
+        if (categories==null) return 0;
+        for (Category category : categories) {
+            if (category.children != null && category.children.size() > 0){
+                for (Category child : category.children) {
+                    if (child.id == id) return category.id;
+                    int parent = findParent(category.children, id);
+                    if (parent!=0) return parent;
+                }
+            }
+        }
+        return 0;
+
+    }
+
+
+    public String findParent(int id){
+        boolean a=true;
+        RootModel rootModel=tempRoot.get(Lang.OZ);
+        List<Category> categories = rootModel.categories;
+
+//        for (Category category : categories) {
+            int parent = findParent(categories, id);
+            if (parent!=0) return String.valueOf(parent);
+//        }
+        return String.valueOf(1);
+    }
 
 
 }

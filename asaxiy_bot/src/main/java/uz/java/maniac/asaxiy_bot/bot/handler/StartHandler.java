@@ -23,7 +23,7 @@ import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.*;
 import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
 
 @Component
-public class Start implements Handler{
+public class StartHandler implements Handler{
     @Autowired
     private TelegramUserRepository telegramUserRepository;
     @Autowired

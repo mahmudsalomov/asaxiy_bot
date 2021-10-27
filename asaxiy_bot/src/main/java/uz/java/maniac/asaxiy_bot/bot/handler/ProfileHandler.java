@@ -2,11 +2,9 @@ package uz.java.maniac.asaxiy_bot.bot.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import uz.java.maniac.asaxiy_bot.model.ProfileEnum;
 import uz.java.maniac.asaxiy_bot.model.State;
 import uz.java.maniac.asaxiy_bot.model.TelegramUser;
@@ -25,7 +23,7 @@ import java.util.List;
 import static uz.java.maniac.asaxiy_bot.utils.TelegramUtil.createMessageTemplate;
 
 @Component
-public class Profile implements Handler{
+public class ProfileHandler implements Handler{
     @Autowired
     private TelegramUserService userService;
 
@@ -33,7 +31,7 @@ public class Profile implements Handler{
     private MessageTemplate messageTemplate;
 
     @Autowired
-    private Start start;
+    private StartHandler startHandler;
 
     @Autowired
     private TelegramUserRepository telegramUserRepository;
@@ -80,7 +78,7 @@ public class Profile implements Handler{
         if (callback.getData().equals(ProfileEnum.MY_LANGUAGE.name())) {
             user.setLang(null);
             user=telegramUserRepository.save(user);
-            return start.handle(user,callback.getData());
+            return startHandler.handle(user,callback.getData());
         }
         return null;
     }
